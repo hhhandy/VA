@@ -1,0 +1,24 @@
+---
+title: "Project Proposal"
+description: |
+  Visual Analytics
+author:
+  - name: Antonius Handy, Heranshan S/o Subramaniam, Tay Cheng Wei Clarence
+    affiliation: Singapore Management University, Master of IT in Business
+    affiliation_url: https://scis.smu.edu.sg/master-it-business
+date: "`r Sys.Date()`"
+output: 
+  distill::distill_article:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      eval = TRUE,
+                      message = FALSE,
+                      warning = FALSE)
+```
+
+
+
