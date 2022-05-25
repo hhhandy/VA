@@ -93,8 +93,8 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
 
   <!--  https://schema.org/Article -->
-  <meta property="article:published" itemprop="datePublished" content="2022-05-15"/>
-  <meta property="article:created" itemprop="dateCreated" content="2022-05-15"/>
+  <meta property="article:published" itemprop="datePublished" content="2022-05-25"/>
+  <meta property="article:created" itemprop="dateCreated" content="2022-05-25"/>
   <meta name="article:author" content="Antonius Handy, Heranshan S/o Subramaniam, Tay Cheng Wei Clarence"/>
 
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
@@ -113,7 +113,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["Project Proposal"]},{"type":"character","attributes":{},"value":["Visual Analytics\n"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","affiliation","affiliation_url"]}},"value":[{"type":"character","attributes":{},"value":["Antonius Handy, Heranshan S/o Subramaniam, Tay Cheng Wei Clarence"]},{"type":"character","attributes":{},"value":["Singapore Management University, Master of IT in Business"]},{"type":"character","attributes":{},"value":["https://scis.smu.edu.sg/master-it-business"]}]}]},{"type":"character","attributes":{},"value":["2022-05-15"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc","toc_float"]}},"value":[{"type":"logical","attributes":{},"value":[true]},{"type":"logical","attributes":{},"value":[true]}]}]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["Project Proposal"]},{"type":"character","attributes":{},"value":["Visual Analytics\n"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","affiliation","affiliation_url"]}},"value":[{"type":"character","attributes":{},"value":["Antonius Handy, Heranshan S/o Subramaniam, Tay Cheng Wei Clarence"]},{"type":"character","attributes":{},"value":["Singapore Management University, Master of IT in Business"]},{"type":"character","attributes":{},"value":["https://scis.smu.edu.sg/master-it-business"]}]}]},{"type":"character","attributes":{},"value":["2022-05-25"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc","toc_float"]}},"value":[{"type":"logical","attributes":{},"value":[true]},{"type":"logical","attributes":{},"value":[true]}]}]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   <!--radix_placeholder_navigation_in_header-->
@@ -2061,7 +2061,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Project Proposal","description":"Visual Analytics","authors":[{"author":"Antonius Handy, Heranshan S/o Subramaniam, Tay Cheng Wei Clarence","authorURL":"#","affiliation":"Singapore Management University, Master of IT in Business","affiliationURL":"https://scis.smu.edu.sg/master-it-business","orcidID":""}],"publishedDate":"2022-05-15T00:00:00.000+08:00","citationText":"Clarence, 2022"}
+{"title":"Project Proposal","description":"Visual Analytics","authors":[{"author":"Antonius Handy, Heranshan S/o Subramaniam, Tay Cheng Wei Clarence","authorURL":"#","affiliation":"Singapore Management University, Master of IT in Business","affiliationURL":"https://scis.smu.edu.sg/master-it-business","orcidID":""}],"publishedDate":"2022-05-25T00:00:00.000+07:00","citationText":"Clarence, 2022"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -2105,10 +2105,98 @@ Clarence  (Singapore Management University, Master of IT in Business)<a
 href="https://scis.smu.edu.sg/master-it-business"
 class="uri">https://scis.smu.edu.sg/master-it-business</a>
   
-<br/>2022-05-15
+<br/>2022-05-25
 </div>
 
 <div class="d-article">
+<div class="d-contents d-contents-float">
+<nav class="l-text toc figcaption" id="TOC">
+<h3>Contents</h3>
+<ul>
+<li><a href="#problem-statement">1. Problem Statement</a></li>
+<li><a href="#data-source">2. Data Source</a></li>
+<li><a href="#methodology">3. Methodology</a></li>
+<li><a href="#sketched-of-proposed-design">4. Sketched of Proposed
+Design</a>
+<ul>
+<li><a href="#social-area-networks">4.1 Social Area Networks</a></li>
+<li><a href="#traffic-bottlenecks">4.2 Traffic Bottlenecks</a></li>
+<li><a href="#daily-routines-of-participants">4.3 Daily Routines of
+Participants</a></li>
+<li><a href="#pattern-changes">4.4 Pattern Changes</a></li>
+</ul></li>
+<li><a href="#expected-difficulties">5. Expected Difficulties</a></li>
+</ul>
+</nav>
+</div>
+<h2 id="problem-statement">1. Problem Statement</h2>
+<p>In <a href="https://vast-challenge.github.io/2022/"><strong>VAST
+Challenge 2022</strong></a>, the city of Engagement, Ohio USA is
+anticipating future rapid growth by doing a participatory urban planning
+survey. A total of 1011 representative residents have agreed to provide
+their data using the urban planning app, such as the places they visit
+and their financial journal.</p>
+<p>Out of 3 challenges in VAST Challenge 2022, we decided to select
+<strong>Challenge 2: Patterns of Life</strong>. In this challenge, we
+will reveal the patterns of daily life throughout the city.
+Specifically, we will characterize the distinct areas within the city,
+identify the potential traffic bottlenecks, describe the daily routines
+for selected participants and examine how patterns change over time.</p>
+<h2 id="data-source">2. Data Source</h2>
+<p>Datasets were obtained from the VAST Challenge 2022 official website
+in csv format. Datasets required for this challenge are including, but
+not limited to:</p>
+<ul>
+<li>ParticipantStatusLogs(n).csv</li>
+<li>Buildings.csv</li>
+<li>Participants.csv</li>
+<li>Pubs.csv</li>
+<li>Restaurants.csv</li>
+<li>CheckinJournal.csv</li>
+</ul>
+<p>There is also a high possibility to join some of these datasets
+together and save it as a new dataset as we go along.</p>
+<h2 id="methodology">3. Methodology</h2>
+<p>The following are the packages required for this challenge, including
+but not limited to:</p>
+<ul>
+<li>tidyverse</li>
+<li>sf</li>
+<li>tmap</li>
+<li>lubridate</li>
+<li>clock</li>
+<li>ViSiElse</li>
+<li>gganimate</li>
+</ul>
+<p>To start with, these packages will be launched using
+<code>library()</code>.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>packages</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'sf'</span>, <span class='st'>'tidyverse'</span>,<span class='st'>'tmap'</span>,<span class='st'>'lubridate'</span>,<span class='st'>'clock'</span>,<span class='st'>'ViSiElse'</span>,<span class='st'>'gganimate'</span><span class='op'>)</span>
+<span class='kw'>for</span> <span class='op'>(</span><span class='va'>p</span> <span class='kw'>in</span> <span class='va'>packages</span><span class='op'>)</span><span class='op'>{</span>
+  <span class='kw'>if</span><span class='op'>(</span><span class='op'>!</span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'>p</span>, character.only <span class='op'>=</span> <span class='cn'>T</span><span class='op'>)</span><span class='op'>)</span><span class='op'>{</span>
+    <span class='fu'><a href='https://rdrr.io/r/utils/install.packages.html'>install.packages</a></span><span class='op'>(</span><span class='va'>p</span><span class='op'>)</span>
+  <span class='op'>}</span>
+<span class='op'>}</span>
+</code></pre>
+</div>
+</div>
+<h2 id="sketched-of-proposed-design">4. Sketched of Proposed Design</h2>
+<h3 id="social-area-networks">4.1 Social Area Networks</h3>
+<h3 id="traffic-bottlenecks">4.2 Traffic Bottlenecks</h3>
+<p><img src="image/TrafficBottleneck.PNG" /></p>
+<h3 id="daily-routines-of-participants">4.3 Daily Routines of
+Participants</h3>
+<p><img src="image/DailyRoutine.PNG" /></p>
+<h3 id="pattern-changes">4.4 Pattern Changes</h3>
+<h2 id="expected-difficulties">5. Expected Difficulties</h2>
+<p>As we progress through the project, we might face some difficulties
+as follows.</p>
+<ul>
+<li>Data Cleaning</li>
+</ul>
+<p>To use ViSiElse package, there is a need for us to get the duration
+for each activity by having timestamp conversion.</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->

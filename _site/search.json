@@ -6,7 +6,7 @@
       "description": "Some additional details about the website",
       "author": [],
       "contents": "\r\n\r\n\r\n\r\n",
-      "last_modified": "2022-05-15T22:51:03+08:00"
+      "last_modified": "2022-05-15T21:51:03+07:00"
     },
     {
       "path": "index.html",
@@ -14,7 +14,7 @@
       "description": "Welcome to the website. I hope you enjoy it!\n",
       "author": [],
       "contents": "\r\n\r\n\r\n\r\n",
-      "last_modified": "2022-05-15T22:58:48+08:00"
+      "last_modified": "2022-05-25T19:21:29+07:00"
     },
     {
       "path": "proposal.html",
@@ -27,8 +27,8 @@
         }
       ],
       "date": "`r Sys.Date()`",
-      "contents": "\r\n\r\n\r\n\r\n",
-      "last_modified": "2022-05-15T22:58:17+08:00"
+      "contents": "\r\n\r\nContents\r\n1. Problem Statement\r\n2. Data Source\r\n3. Methodology\r\n4. Sketched of Proposed\r\nDesign\r\n4.1 Social Area Networks\r\n4.2 Traffic Bottlenecks\r\n4.3 Daily Routines of\r\nParticipants\r\n4.4 Pattern Changes\r\n\r\n5. Expected Difficulties\r\n\r\n1. Problem Statement\r\nIn VAST\r\nChallenge 2022, the city of Engagement, Ohio USA is\r\nanticipating future rapid growth by doing a participatory urban planning\r\nsurvey. A total of 1011 representative residents have agreed to provide\r\ntheir data using the urban planning app, such as the places they visit\r\nand their financial journal.\r\nOut of 3 challenges in VAST Challenge 2022, we decided to select\r\nChallenge 2: Patterns of Life. In this challenge, we\r\nwill reveal the patterns of daily life throughout the city.\r\nSpecifically, we will characterize the distinct areas within the city,\r\nidentify the potential traffic bottlenecks, describe the daily routines\r\nfor selected participants and examine how patterns change over time.\r\n2. Data Source\r\nDatasets were obtained from the VAST Challenge 2022 official website\r\nin csv format. Datasets required for this challenge are including, but\r\nnot limited to:\r\nParticipantStatusLogs(n).csv\r\nBuildings.csv\r\nParticipants.csv\r\nPubs.csv\r\nRestaurants.csv\r\nCheckinJournal.csv\r\nThere is also a high possibility to join some of these datasets\r\ntogether and save it as a new dataset as we go along.\r\n3. Methodology\r\nThe following are the packages required for this challenge, including\r\nbut not limited to:\r\ntidyverse\r\nsf\r\ntmap\r\nlubridate\r\nclock\r\nViSiElse\r\ngganimate\r\nTo start with, these packages will be launched using\r\nlibrary().\r\n\r\n\r\npackages = c('sf', 'tidyverse','tmap','lubridate','clock','ViSiElse','gganimate')\r\nfor (p in packages){\r\n  if(!require(p, character.only = T)){\r\n    install.packages(p)\r\n  }\r\n}\r\n\r\n\r\n\r\n4. Sketched of Proposed Design\r\n4.1 Social Area Networks\r\n4.2 Traffic Bottlenecks\r\n\r\n4.3 Daily Routines of\r\nParticipants\r\n\r\n4.4 Pattern Changes\r\n5. Expected Difficulties\r\nAs we progress through the project, we might face some difficulties\r\nas follows.\r\nData Cleaning\r\nTo use ViSiElse package, there is a need for us to get the duration\r\nfor each activity by having timestamp conversion.\r\n\r\n\r\n\r\n",
+      "last_modified": "2022-05-25T19:20:42+07:00"
     }
   ],
   "collections": []

@@ -17,8 +17,70 @@ output:
 knitr::opts_chunk$set(echo = TRUE,
                       eval = TRUE,
                       message = FALSE,
-                      warning = FALSE)
+                      warning = FALSE,
+                      fig.retina = 3)
 ```
 
+## 1. Problem Statement
 
+In [**VAST Challenge 2022**](https://vast-challenge.github.io/2022/), the city of Engagement, Ohio USA is anticipating future rapid growth by doing a participatory urban planning survey. A total of 1011 representative residents have agreed to provide their data using the urban planning app, such as the places they visit and their financial journal.
 
+Out of 3 challenges in VAST Challenge 2022, we decided to select **Challenge 2: Patterns of Life**. In this challenge, we will reveal the patterns of daily life throughout the city. Specifically, we will characterize the distinct areas within the city, identify the potential traffic bottlenecks, describe the daily routines for selected participants and examine how patterns change over time.
+
+## 2. Data Source
+
+Datasets were obtained from the VAST Challenge 2022 official website in csv format. Datasets required for this challenge are including, but not limited to:
+
+- ParticipantStatusLogs(n).csv
+- Buildings.csv
+- Participants.csv
+- Pubs.csv
+- Restaurants.csv
+- CheckinJournal.csv
+
+There is also a high possibility to join some of these datasets together and save it as a new dataset as we go along.
+
+## 3. Methodology
+
+The following are the packages required for this challenge, including but not limited to:
+
+- tidyverse
+- sf
+- tmap
+- lubridate
+- clock
+- ViSiElse
+- gganimate
+
+To start with, these packages will be launched using `library()`.
+
+```{r}
+packages = c('sf', 'tidyverse','tmap','lubridate','clock','ViSiElse','gganimate')
+for (p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+}
+```
+
+## 4. Sketched of Proposed Design
+
+### 4.1 Social Area Networks
+
+### 4.2 Traffic Bottlenecks
+
+![](image/TrafficBottleneck.PNG)
+
+### 4.3 Daily Routines of Participants
+
+![](image/DailyRoutine.PNG)
+
+### 4.4 Pattern Changes
+
+## 5. Expected Difficulties
+
+As we progress through the project, we might face some difficulties as follows.
+
+- Data Cleaning
+
+To use ViSiElse package, there is a need for us to get the duration for each activity by having timestamp conversion.
