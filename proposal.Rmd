@@ -38,20 +38,20 @@ Datasets were obtained from the VAST Challenge 2022 official website in csv form
 - Restaurants.csv
 - CheckinJournal.csv
 
-How these datasets are used and data processing will be further explained in the next section below.
+Data processing will be further explained in the next section below.
 
 ## 3. Methodology
 
 The following are the packages required for this challenge, including but not limited to:
 
--	tidyverse: to support data science including data manipulation and static statistical graphs creation  
--	sf: to handle geospatial data in wkt format
--	tmap: to visualize movement data
--	lubridate: to manipulate date-time object
--	clock: to manipulate date-time object
--	ViSiElse: to visualize daily routines
--	gganimate: to create animated statistical graphs for time-series analysis 
--	ggstatsplot: to provide statistical details
+-	**tidyverse**: to support data science including data manipulation and static statistical graphs creation  
+-	**sf**: to handle geospatial data in wkt format
+-	**tmap**: to visualize movement data
+-	**lubridate**: to manipulate date-time object
+-	**clock**: to manipulate date-time object
+-	**ViSiElse**: to visualize daily routines
+-	**gganimate**: to create animated statistical graphs for time-series analysis 
+-	**ggstatsplot**: to provide statistical details
 
 
 ## 4. Proposed Visualization
@@ -73,6 +73,8 @@ The intent of this visualization is to show the outline of the different buildin
 The Apartment, Pubs, Restaurant, Schools, and Employer data files are to be merged into a single file with only the facility type and building number retained. This will aid in the minimizing of the data file size.
 
 #### Example of Visualization
+
+![](image/Q1V1.png)
 
 #### Anticipated Problems and Areas for Improvements
 
@@ -96,6 +98,8 @@ The Participant dataset will be used for this visualization. No further processi
 
 #### Example of Visualization
 
+![](image/Q1V2.png)
+
 #### Anticipated Problems and Areas for Improvements
 
 At this juncture it is not clear if a having both plots on a single graph would be best option. Alternatively, we could explore having two plots with their own filters. 
@@ -112,7 +116,11 @@ A snapshot of the participants apartment Id will be taken for the start of every
 
 #### Example of Visualization
 
+![](image/Q1V3.png)
+
 #### Anticipated Problems and Areas for Improvements
+
+A possible area for improvement could be to animate the changes in occupancy rate over the different months to showcase the difference. 
 
 ### Visualization 4: Hexagonal Binning Map for Cost of Rental and Facilities
 
@@ -125,6 +133,8 @@ This visualization aims to show how cost of rental and other facilities differ a
 Firstly, the additional data that is not required all the datasets (Apartments, Schools, Restaurants and Pubs) will be dropped to reduce file size. Following this, the average cost associated with each building will be computed using group by function. The Apartment dataset will be used to compute the average per occupant rental cost for each building.
 
 #### Example of Visualization
+
+![](image/Q1V4.png)
 
 #### Anticipated Problems and Areas for Improvements
 
@@ -149,6 +159,8 @@ To optimize memory load, only the participants’ location data will be extracte
 
 #### Example of Visualization
 
+![](image/Q2V1.png)
+
 #### Anticipated Problems and Areas for Improvements
 
 The amount of data is expected to be huge even with selective extraction/cleaning at the start. We will optimize again if it becomes too cumbersome to produce the charts.
@@ -168,6 +180,8 @@ The participants’ location data will be extracted (hourly snapshot) from the m
 
 #### Example of Visualization
 
+![](image/Q2V2.jpg)
+
 #### Anticipated Problems and Areas for Improvements
 
 The amount of data is expected to be huge even with selective extraction/cleaning at the start. We will optimize again if it becomes too cumbersome to produce the charts.
@@ -186,9 +200,12 @@ Participants have given permission to have their daily routines captured. Choose
 This visualization will show daily activities of two selected participants. Using demographic variables, day, and month filtering options, this will tell the audience how their weekdays and weekends routines vary across different months. For example, we will compare Sunday activities of the happiest participant against the unhappiest participant in December 2022.
 
 #### Data Processing
+
 We will be using a new joined dataset derived from 72 ParticipantsStatusLog datasets for daily activities. Using demographic variables such as joviality, we will select two participants that are at the extreme ends. Next, we will filter these two participant IDs and save it as a new dataset.
 
 #### Example of Visualization
+
+![](image/Q3V1.png)
 
 #### Anticipated Problems and Areas for Improvements
 
