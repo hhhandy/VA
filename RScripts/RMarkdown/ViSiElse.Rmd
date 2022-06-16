@@ -54,12 +54,25 @@ participantMaxJ <- Participants$participantId[Participants$joviality
 participantMinJ <- Participants$participantId[Participants$joviality 
                                               == min(Participants$joviality)]
 
-selectedParticipants <- c(participantMinJ, participantMaxJ)
+selectedParticipantsJov <- c(participantMinJ, participantMaxJ)
 
 print(paste("Participant with max joviality is: ", participantMaxJ, ".",
             "Participant with min joviality is: ", participantMinJ, sep=""))
 ```
 Participant with the highest joviality is participant 113 and participant with the lowest joviality is participant 758.
+
+```{r, eval=FALSE}
+participantMaxA <- Participants$participantId[Participants$age
+                                              == max(Participants$age)][1]
+
+participantMinA <- Participants$participantId[Participants$age 
+                                              == min(Participants$age)][1]
+
+selectedParticipantsAge <- c(participantMinA, participantMaxA)
+
+print(paste("Participant with max age is: ", participantMaxA, ".",
+            "Participant with min age is: ", participantMinA, sep=""))
+```
 
 ```{r}
 print(subset(Participants, Participants$participantId %in% c(113,758)))
@@ -70,14 +83,14 @@ print(subset(Participants, Participants$participantId %in% c(113,758)))
 ```{r, eval=FALSE}
 allFiles <- dir(path = "data/Activity Logs/", full.names = TRUE)
 
-ParticipantsLog <- NULL
+ParticipantsLogJov <- NULL
 
 for (i in allFiles) {
   temp <- read_csv(i)
   
-  temp <- subset(temp, temp$participantId %in% selectedParticipants)
+  temp <- subset(temp, temp$participantId %in% selectedParticipantsJov)
   
-  ParticipantsLog <- rbind(ParticipantsLog, temp)
+  ParticipantsLogJov <- rbind(ParticipantsLogJov, temp)
   
   temp <- NULL
 }
@@ -89,50 +102,79 @@ for (i in allFiles) {
 ```{r, eval=FALSE}
 keep <- c("participantId", "timestamp", "currentMode", "sleepStatus")
 
-ParticipantsLog <- ParticipantsLog[, keep]
+ParticipantsLogJov <- ParticipantsLogJov[, keep]
 
-Participant758 <- subset(ParticipantsLog, ParticipantsLog$participantId == 758)
-Participant113<- subset(ParticipantsLog, ParticipantsLog$participantId == 113)
-
-keep <- c("timestamp", "currentMode", "sleepStatus")
-Participant758 <- ParticipantsLog[, keep]
-Participant113 <- ParticipantsLog[, keep]
 ```
 
-# Participant 758
+# Introduce day field
+```{r}
+ParticipantsLogJov <-ParticipantsLogJov %>%
+  mutate(day = weekdays(timestamp)) 
+```
 
-## Data Prep for Participant 758
+```{r}
+
+weekday <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+weekend <- c("Saturday", "Sunday")
+
+Participant758Weekday <- ParticipantsLogJov %>%
+  filter(day %in% weekday) %>%
+  filter(participantId == 758)
+
+Participant758Weekend <- ParticipantsLogJov %>%
+  filter(day %in% weekend) %>%
+  filter(participantId == 758)
+
+Participant113Weekday <- ParticipantsLogJov %>%
+  filter(day %in% weekday) %>%
+  filter(participantId == 113)
+
+Participant113Weekend <- ParticipantsLogJov %>%
+  filter(day %in% weekend) %>%
+  filter(participantId == 113)
+
+keep <- c("timestamp", "currentMode", "sleepStatus", "day")
+Participant758Weekday <- Participant758Weekday[, keep]
+Participant758Weekend <- Participant758Weekend[, keep]
+Participant113Weekday <- Participant113Weekday[, keep]
+Participant113Weekend <- Participant113Weekend[, keep]
+
+```
+
+# Participant 758 Weekday
+
+## Data Prep for Participant 758 Weekday
 
 ### Create minutes and date column 
 
 ```{r, eval=FALSE}
-Participant758 <- Participant758 %>%
+Participant758Weekday <- Participant758Weekday %>%
   mutate(minutes = hour(timestamp)*60 + minute(timestamp))
 ```
 
 ```{r, eval=FALSE}
-Participant758 <- Participant758 %>%
+Participant758Weekday <- Participant758Weekday %>%
   mutate(date = date(timestamp))
 ```
 
 ```{r, eval=FALSE}
-Participant758$status <- paste(Participant758$currentMode, 
-                               Participant758$sleepStatus, sep="-")
+Participant758Weekday$status <- paste(Participant758Weekday$currentMode, 
+                               Participant758Weekday$sleepStatus, sep="-")
 ```
 
 ### Wake up
 
 ```{r, eval=FALSE}
-Participant758Summary <- Participant758 %>%
+P758WeekdaySummary <- Participant758Weekday %>%
   filter(status == "AtHome-Awake" & minutes != 0) %>%
   group_by(date) %>%
   summarise(minutes = min(minutes))
 
-names(Participant758Summary) = c("Dates", "WakeUp")
+names(P758WeekdaySummary) = c("Dates", "WakeUp")
 ```
 
 ```{r, eval=FALSE}
-Participant758Summary$Sleep <- Participant758 %>%
+P758WeekdaySummary$Sleep <- Participant758Weekday %>%
   filter(status == "AtHome-Awake" & minutes != 0) %>%
   group_by(date) %>%
   summarise(minutes = max(minutes)) %>%
@@ -141,64 +183,143 @@ Participant758Summary$Sleep <- Participant758 %>%
 
 ### Transport
 
+#### Transport Day Start
+
 ```{r, eval=FALSE}
-Participant758Summary$TransportDayStart <- Participant758 %>%
+TransportWeekDay758 <- Participant758Weekday %>%
   filter(status == "Transport-Awake" & minutes != 0 & minutes <= 720) %>%
   group_by(date) %>%
-  summarise(minutes = min(minutes)) %>%
-  select(minutes)
+  summarise(minutes = min(minutes))
+
+names(TransportWeekDay758) = c("Dates", "TransportDayStart")
 ```
 
 ```{r, eval=FALSE}
-Participant758Summary$TransportEveningStart <- Participant758 %>%
-  filter(status == "AtHome-Awake" & minutes != 0& minutes > 1035) %>%
-  group_by(date) %>%
-  summarise(minutes = min(minutes)) %>%
-  select(minutes)
-```
-
-```{r, eval= FALSE}
-Participant758Summary$TransportEveningStart <- Participant758 %>%
-  filter(status == "Transport-Awake" & minutes != 0 & minutes > 720) %>%
-  group_by(date) %>%
-  summarise(minutes = min(minutes)) %>%
-  select(minutes)
+P758WeekdaySummary$TransportDayStart <- NA
 ```
 
 ```{r, eval=FALSE}
-Participant758Summary$Backhome <- Participant758 %>%
+
+for (i in as.character(TransportWeekDay758$Dates)) {
+  for (g in as.character(P758WeekdaySummary$Dates)) {
+    if (g == i) {
+      P758WeekdaySummary$TransportDayStart[as.character(P758WeekdaySummary$Dates)
+                                       == i] =
+        TransportWeekDay758$TransportDayStart[as.character(TransportWeekDay758$Dates) == i]
+      
+    }
+  }
+}
+```
+
+#### Transport Evening Start
+
+```{r, eval=FALSE}
+TransportWeekDay758 <- Participant758Weekday %>%
+  filter(status == "Transport-Awake" & minutes != 0 & minutes > 1035) %>%
+  group_by(date) %>%
+  summarise(minutes = min(minutes))
+
+names(TransportWeekDay758) = c("Dates", "TransportEveningStart")
+```
+
+```{r, eval=FALSE}
+P758WeekdaySummary$TransportEveningStart <- NA
+```
+
+```{r, eval=FALSE}
+
+for (i in as.character(TransportWeekDay758$Dates)) {
+  for (g in as.character(P758WeekdaySummary$Dates)) {
+    if (g == i) {
+      P758WeekdaySummary$TransportEveningStart[as.character(P758WeekdaySummary$Dates)
+                                       == i] =
+        TransportWeekDay758$TransportEveningStart[as.character(TransportWeekDay758$Dates) == i]
+      
+    }
+  }
+}
+```
+
+#### Back Home
+
+```{r, eval=FALSE}
+P758WeekdaySummary$Backhome <- Participant758Weekday %>%
   filter(status == "AtHome-Awake" & minutes != 0) %>%
   group_by(date) %>%
   summarise(minutes = max(minutes)) %>%
   select(minutes)
 ```
 
+#### WorkStart
+
 ```{r, eval=FALSE}
-Participant758Summary$WorkStart <- Participant758 %>%
+WorkStart758 <- Participant758Weekday %>%
   filter(status == "AtWork-Awake" & minutes != 0) %>%
   group_by(date) %>%
-  summarise(minutes = min(minutes)) %>%
-  select(minutes)
+  summarise(minutes = min(minutes)) 
+
+names(WorkStart758) = c("Dates", "WorkStart")
 ```
 
 ```{r, eval=FALSE}
-Participant758Summary$WorkEnd <- Participant758 %>%
-  filter(status == "AtWork-Awake" & minutes != 0& minutes > 720) %>%
+P758WeekdaySummary$WorkStart <- NA
+```
+
+```{r, eval=FALSE}
+
+for (i in as.character(WorkStart758$Dates)) {
+  for (g in as.character(P758WeekdaySummary$Dates)) {
+    if (g == i) {
+      P758WeekdaySummary$WorkStart[as.character(P758WeekdaySummary$Dates)
+                                       == i] =
+        WorkStart758$WorkStart[as.character(WorkStart758$Dates) == i]
+      
+    }
+  }
+}
+```
+
+#### WorkEnd
+
+```{r, eval=FALSE}
+WorkEnd758 <- Participant758Weekday %>%
+  filter(status == "AtWork-Awake" & minutes != 0 & minutes > 720) %>%
   group_by(date) %>%
-  summarise(minutes = max(minutes)) %>%
-  select(minutes)
+  summarise(minutes = max(minutes)) 
+
+names(WorkEnd758) = c("Dates", "WorkEnd")
 ```
 
+```{r, eval=FALSE}
+P758WeekdaySummary$WorkEnd <- NA
+```
 
 ```{r, eval=FALSE}
-Participant758$status[Participant758$status == "AtRestaurant-PrepareToSleep"] 
-= "AtRestaurant-Awake"
+
+for (i in as.character(WorkEnd758$Dates)) {
+  for (g in as.character(P758WeekdaySummary$Dates)) {
+    if (g == i) {
+      P758WeekdaySummary$WorkEnd[as.character(P758WeekdaySummary$Dates)
+                                       == i] =
+        WorkEnd758$WorkEnd[as.character(WorkEnd758$Dates) == i]
+      
+    }
+  }
+}
+```
+
+### Tidy data
+
+```{r, eval=FALSE}
+Participant758Weekday$status[Participant758Weekday$status == "AtRestaurant-PrepareToSleep"] <- "AtRestaurant-Awake"
+
 ```
 
 ### Lunch
 
 ```{r, eval=FALSE}
-Lunch758 <- Participant758 %>%
+Lunch758 <- Participant758Weekday %>%
   filter(status == "AtRestaurant-Awake" & minutes != 0 & date != "2023-05-24" 
          & minutes <= 960) %>%
   group_by(date) %>%
@@ -208,7 +329,7 @@ names(Lunch758) = c("Dates", "LunchStart")
 ```
 
 ```{r, eval=FALSE}
-Lunch758$LunchEnd<- Participant758 %>%
+Lunch758$LunchEnd<- Participant758Weekday %>%
   filter(status == "AtRestaurant-Awake" & minutes != 0 & date != "2023-05-24" 
          & minutes <= 960) %>%
   group_by(date) %>%
@@ -217,9 +338,9 @@ Lunch758$LunchEnd<- Participant758 %>%
 ```
 
 ```{r, eval=FALSE}
-Participant758Summary$LunchStart <- NA
+P758WeekdaySummary$LunchStart <- NA
 
-Participant758Summary$LunchEnd <- NA
+P758WeekdaySummary$LunchEnd <- NA
 ```
 
 ```{r, eval=FALSE}
@@ -233,13 +354,13 @@ Lunch758$LunchEnd <- as.data.frame(Lunch758$LunchEnd)[[1]]
 ```{r, eval=FALSE}
 
 for (i in as.character(Lunch758$Dates)) {
-  for (g in as.character(Participant758Summary$Dates)) {
+  for (g in as.character(P758WeekdaySummary$Dates)) {
     if (g == i) {
-      Participant758Summary$LunchStart[as.character(Participant758Summary$Dates)
+      P758WeekdaySummary$LunchStart[as.character(P758WeekdaySummary$Dates)
                                        == i] =
         Lunch758$LunchStart[as.character(Lunch758$Dates) == i]
       
-      Participant758Summary$LunchEnd[as.character(Participant758Summary$Dates)
+      P758WeekdaySummary$LunchEnd[as.character(P758WeekdaySummary$Dates)
                                      == i] = 
         Lunch758$LunchEnd[as.character(Lunch758$Dates) == i]
     }
@@ -251,9 +372,9 @@ for (i in as.character(Lunch758$Dates)) {
 ### Dinner
 
 ```{r, eval=FALSE}
-Dinner758 <- Participant758 %>%
+Dinner758 <- Participant758Weekday %>%
   filter(status == "AtRestaurant-Awake" & minutes != 0 & date != "2023-05-24" 
-         & minutes > 960) %>%
+         & minutes >960) %>%
   group_by(date) %>%
   summarise(minutes = min(minutes))
 
@@ -261,7 +382,7 @@ names(Dinner758) = c("Dates", "DinnerStart")
 ```
 
 ```{r, eval=FALSE}
-Dinner758$DinnerEnd<- Participant758 %>%
+Dinner758$DinnerEnd<- Participant758Weekday %>%
   filter(status == "AtRestaurant-Awake" & minutes != 0 & date != "2023-05-24" 
          & minutes > 960) %>%
   group_by(date) %>%
@@ -270,9 +391,9 @@ Dinner758$DinnerEnd<- Participant758 %>%
 ```
 
 ```{r, eval=FALSE}
-Participant758Summary$DinnerStart <- NA
+P758WeekdaySummary$DinnerStart <- NA
 
-Participant758Summary$DinnerEnd <- NA
+P758WeekdaySummary$DinnerEnd <- NA
 ```
 
 ```{r, eval=FALSE}
@@ -286,13 +407,13 @@ Dinner758$DinnerEnd <- as.data.frame(Dinner758$DinnerEnd)[[1]]
 ```{r, eval=FALSE}
 
 for (i in as.character(Dinner758$Dates)) {
-  for (g in as.character(Participant758Summary$Dates)) {
+  for (g in as.character(P758WeekdaySummary$Dates)) {
     if (g == i) {
-      Participant758Summary$DinnerStart[as.character(Participant758Summary$Dates)
+      P758WeekdaySummary$DinnerStart[as.character(P758WeekdaySummary$Dates)
                                         == i] =
         Dinner758$DinnerStart[as.character(Dinner758$Dates) == i]
       
-      Participant758Summary$DinnerEnd[as.character(Participant758Summary$Dates)
+      P758WeekdaySummary$DinnerEnd[as.character(P758WeekdaySummary$Dates)
                                       == i] = 
         Dinner758$DinnerEnd[as.character(Dinner758$Dates) == i]
     }
@@ -304,14 +425,12 @@ for (i in as.character(Dinner758$Dates)) {
 ### Recreation 
 
 ```{r, eval=FALSE}
-Participant758$status[Participant758$status == "AtRecreation-PrepareToSleep"] 
-= "AtRecreation-Awake"
+Participant758Weekday$status[Participant758Weekday$status == "AtRecreation-PrepareToSleep"] = "AtRecreation-Awake"
 ```
 
 ```{r, eval=FALSE}
-Recreation758 <- Participant758 %>%
-  filter(status == "AtRecreation-Awake" & minutes != 0 & date != "2023-05-24") 
-%>%
+Recreation758 <- Participant758Weekday %>%
+  filter(status == "AtRecreation-Awake" & minutes != 0 & date != "2023-05-24") %>%
   group_by(date) %>%
   summarise(minutes = min(minutes)) 
 
@@ -319,18 +438,17 @@ names(Recreation758) = c("Dates", "RecreationStart")
 ```
 
 ```{r, eval=FALSE}
-Recreation758$RecreationEnd<- Participant758 %>%
-  filter(status == "AtRecreation-Awake" & minutes != 0 & date != "2023-05-24" ) 
-%>%
+Recreation758$RecreationEnd<- Participant758Weekday %>%
+  filter(status == "AtRecreation-Awake" & minutes != 0 & date != "2023-05-24" ) %>%
   group_by(date) %>%
   summarise(minutes = max(minutes)) %>%
   select(minutes)
 ```
 
 ```{r, eval=FALSE}
-Participant758Summary$RecreationStart <- NA
+P758WeekdaySummary$RecreationStart <- NA
 
-Participant758Summary$RecreationEnd <- NA
+P758WeekdaySummary$RecreationEnd <- NA
 ```
 
 ```{r, eval=FALSE}
@@ -344,14 +462,14 @@ Recreation758$RecreationEnd <- as.data.frame(Recreation758$RecreationEnd)[[1]]
 ```{r, eval=FALSE}
 
 for (i in as.character(Recreation758$Dates)) {
-  for (g in as.character(Participant758Summary$Dates)) {
+  for (g in as.character(P758WeekdaySummary$Dates)) {
     if (g == i) {
-      Participant758Summary$RecreationStart[
-        as.character(Participant758Summary$Dates) == i] =
+      P758WeekdaySummary$RecreationStart[
+        as.character(P758WeekdaySummary$Dates) == i] =
         Recreation758$RecreationStart[as.character(Recreation758$Dates) == i]
       
-      Participant758Summary$RecreationEnd[
-        as.character(Participant758Summary$Dates) == i] = 
+      P758WeekdaySummary$RecreationEnd[
+        as.character(P758WeekdaySummary$Dates) == i] = 
         Recreation758$RecreationEnd[as.character(Recreation758$Dates) == i]
     }
   }
@@ -362,25 +480,24 @@ for (i in as.character(Recreation758$Dates)) {
 
 ```{r, eval=FALSE}
 
-PrepareToSleep<- Participant758 %>%
-  filter(status == "AtHome-PrepareToSleep" & minutes != 0 
-         & date != "2023-05-24") %>%
+PrepareToSleep<- Participant758Weekday %>%
+  filter(status == "AtHome-PrepareToSleep" & minutes != 0 & date != "2023-05-24") %>%
   group_by(date) %>%
   summarise(minutes = max(minutes)) 
 
 ```
 
 ```{r, eval=FALSE}
-Participant758Summary$PrepareToSleep <- NA
+P758WeekdaySummary$PrepareToSleep <- NA
 
 ```
 
 ```{r, eval=FALSE}
 for (i in as.character(PrepareToSleep$date)) {
-  for (g in as.character(Participant758Summary$Dates)) {
+  for (g in as.character(P758WeekdaySummary$Dates)) {
     if (g == i) {
-      Participant758Summary$PrepareToSleep[
-        as.character(Participant758Summary$Dates) == i] = 
+      P758WeekdaySummary$PrepareToSleep[
+        as.character(P758WeekdaySummary$Dates) == i] = 
         PrepareToSleep$minutes[as.character(PrepareToSleep$date) == i]
       
     }
@@ -391,42 +508,32 @@ for (i in as.character(PrepareToSleep$date)) {
 ### Further Cleaning
 
 ```{r, eval=FALSE}
-Participant758Summary$Sleep <- 
-  as.data.frame(Participant758Summary$Sleep)[[1]]
+P758WeekdaySummary$Sleep <- 
+  as.data.frame(P758WeekdaySummary$Sleep)[[1]]
 
-Participant758Summary$TransportDayStart <- 
-  as.data.frame(Participant758Summary$TransportDayStart)[[1]]
+P758WeekdaySummary$Backhome <- 
+  as.data.frame(P758WeekdaySummary$Backhome)[[1]]
 
-Participant758Summary$TransportEveningStart <- as.data.frame(Participant758Summary$TransportEveningStart)[[1]]
-
-Participant758Summary$Backhome <- 
-  as.data.frame(Participant758Summary$Backhome)[[1]]
-
-Participant758Summary$WorkStart <- 
-  as.data.frame(Participant758Summary$WorkStart)[[1]]
-
-Participant758Summary$WorkEnd <- 
-  as.data.frame(Participant758Summary$WorkEnd)[[1]]
 
 ```
 
 ```{r, eval=FALSE}
-Participant758Summary$StartSleep <- 0
+P758WeekdaySummary$StartSleep <- 0
 
 ```
 
 ```{r, eval=FALSE}
-Clean758 <- as.data.frame(lapply(Participant758Summary, as.integer))
+Clean758 <- as.data.frame(lapply(P758WeekdaySummary, as.integer))
 ```
 
 ```{r, echo=FALSE, eval=FALSE}
 write_rds(Clean758,
-          "data/rds/Clean758.rds")
+          "data/rds/Weekday758.rds")
 
 ```
 
 ```{r, echo=FALSE}
-Clean758 <- read_rds("data/rds/Clean758.rds")
+Weekday758 <- read_rds("data/rds/Weekday758.rds")
 
 ```
 
@@ -434,7 +541,7 @@ Clean758 <- read_rds("data/rds/Clean758.rds")
 
 ```{r}
 
-p1 <- visielse(Clean758, informer = NULL)
+p1 <- visielse(Weekday758, informer = NULL)
 b1 <- ConvertFromViSibook(p1@book)
 
 ```
@@ -460,57 +567,56 @@ b1 <- b1[order(as.numeric(b1$showorder)), ]
 ```
 
 ```{r}
-v2 <- visielse(Clean758, 
+v2 <- visielse(Weekday758, 
                book = b1, 
-               informer = NULL, 
+               informer = "median", 
                doplot = F, 
                pixel = 30)
 plot(v2, 
      vp0w = 0.7, 
      unit.tps = "min", 
      scal.unit.tps = 30, 
-     main = "Typical day for Participant 758")
+     main = "Typical Weekday for Participant 758")
 ```
 
 ### Comments
 
 From the visualization it can be seen that the participant is very routine in terms of their when they wake up and head to bed. However, it can be seen that their lunch time is quite erratic. Working hours is very routine as well. One interesting observation is that there are times when the participant heads out to dinner. These occurrences are few and not routine. Furthermore, the start and end of their reacreation period is also not regular, indicating that it may differ depending on the day of the week.
 
+# Participant 113 Weekday
 
-# Participant 113
+## Data Prep for Participant 113 Weekday
 
-## Data Prep for Participant 113
-
-### Create minutes and date column
+### Create minutes and date column 
 
 ```{r, eval=FALSE}
-Participant113 <- Participant113 %>%
+Participant113Weekday <- Participant113Weekday %>%
   mutate(minutes = hour(timestamp)*60 + minute(timestamp))
 ```
 
 ```{r, eval=FALSE}
-Participant113 <- Participant113 %>%
+Participant113Weekday <- Participant113Weekday %>%
   mutate(date = date(timestamp))
 ```
 
 ```{r, eval=FALSE}
-Participant113$status <- paste(Participant113$currentMode, 
-                               Participant113$sleepStatus, sep="-")
+Participant113Weekday$status <- paste(Participant113Weekday$currentMode, 
+                               Participant113Weekday$sleepStatus, sep="-")
 ```
 
 ### Wake up
 
 ```{r, eval=FALSE}
-Participant113Summary <- Participant113 %>%
+P113WeekdaySummary <- Participant113Weekday %>%
   filter(status == "AtHome-Awake" & minutes != 0) %>%
   group_by(date) %>%
   summarise(minutes = min(minutes))
 
-names(Participant113Summary) = c("Dates", "WakeUp")
+names(P113WeekdaySummary) = c("Dates", "WakeUp")
 ```
 
 ```{r, eval=FALSE}
-Participant113Summary$Sleep <- Participant113 %>%
+P113WeekdaySummary$Sleep <- Participant113Weekday %>%
   filter(status == "AtHome-Awake" & minutes != 0) %>%
   group_by(date) %>%
   summarise(minutes = max(minutes)) %>%
@@ -519,64 +625,143 @@ Participant113Summary$Sleep <- Participant113 %>%
 
 ### Transport
 
+#### Transport Day Start
+
 ```{r, eval=FALSE}
-Participant113Summary$TransportDayStart <- Participant113 %>%
+TransportWeekDay113 <- Participant113Weekday %>%
   filter(status == "Transport-Awake" & minutes != 0 & minutes <= 720) %>%
   group_by(date) %>%
-  summarise(minutes = min(minutes)) %>%
-  select(minutes)
+  summarise(minutes = min(minutes))
+
+names(TransportWeekDay113) = c("Dates", "TransportDayStart")
 ```
 
 ```{r, eval=FALSE}
-Participant113Summary$TransportEveningStart <- Participant113 %>%
-  filter(status == "AtHome-Awake" & minutes != 0& minutes > 1035) %>%
-  group_by(date) %>%
-  summarise(minutes = min(minutes)) %>%
-  select(minutes)
-```
-
-```{r, eval= FALSE}
-Participant113Summary$TransportEveningStart <- Participant113 %>%
-  filter(status == "Transport-Awake" & minutes != 0 & minutes > 720) %>%
-  group_by(date) %>%
-  summarise(minutes = min(minutes)) %>%
-  select(minutes)
+P113WeekdaySummary$TransportDayStart <- NA
 ```
 
 ```{r, eval=FALSE}
-Participant113Summary$Backhome <- Participant113 %>%
+
+for (i in as.character(TransportWeekDay113$Dates)) {
+  for (g in as.character(P113WeekdaySummary$Dates)) {
+    if (g == i) {
+      P113WeekdaySummary$TransportDayStart[as.character(P113WeekdaySummary$Dates)
+                                       == i] =
+        TransportWeekDay113$TransportDayStart[as.character(TransportWeekDay113$Dates) == i]
+      
+    }
+  }
+}
+```
+
+#### Transport Evening Start
+
+```{r, eval=FALSE}
+TransportWeekDay113 <- Participant113Weekday %>%
+  filter(status == "Transport-Awake" & minutes != 0 & minutes > 1035) %>%
+  group_by(date) %>%
+  summarise(minutes = min(minutes))
+
+names(TransportWeekDay113) = c("Dates", "TransportEveningStart")
+```
+
+```{r, eval=FALSE}
+P113WeekdaySummary$TransportEveningStart <- NA
+```
+
+```{r, eval=FALSE}
+
+for (i in as.character(TransportWeekDay113$Dates)) {
+  for (g in as.character(P113WeekdaySummary$Dates)) {
+    if (g == i) {
+      P113WeekdaySummary$TransportEveningStart[as.character(P113WeekdaySummary$Dates)
+                                       == i] =
+        TransportWeekDay113$TransportEveningStart[as.character(TransportWeekDay113$Dates) == i]
+      
+    }
+  }
+}
+```
+
+#### Back Home
+
+```{r, eval=FALSE}
+P113WeekdaySummary$Backhome <- Participant113Weekday %>%
   filter(status == "AtHome-Awake" & minutes != 0) %>%
   group_by(date) %>%
   summarise(minutes = max(minutes)) %>%
   select(minutes)
 ```
 
+#### WorkStart
+
 ```{r, eval=FALSE}
-Participant113Summary$WorkStart <- Participant113 %>%
+WorkStart113 <- Participant113Weekday %>%
   filter(status == "AtWork-Awake" & minutes != 0) %>%
   group_by(date) %>%
-  summarise(minutes = min(minutes)) %>%
-  select(minutes)
+  summarise(minutes = min(minutes)) 
+
+names(WorkStart113) = c("Dates", "WorkStart")
 ```
 
 ```{r, eval=FALSE}
-Participant113Summary$WorkEnd <- Participant113 %>%
-  filter(status == "AtWork-Awake" & minutes != 0& minutes > 720) %>%
+P113WeekdaySummary$WorkStart <- NA
+```
+
+```{r, eval=FALSE}
+
+for (i in as.character(WorkStart113$Dates)) {
+  for (g in as.character(P113WeekdaySummary$Dates)) {
+    if (g == i) {
+      P113WeekdaySummary$WorkStart[as.character(P113WeekdaySummary$Dates)
+                                       == i] =
+        WorkStart113$WorkStart[as.character(WorkStart113$Dates) == i]
+      
+    }
+  }
+}
+```
+
+#### WorkEnd
+
+```{r, eval=FALSE}
+WorkEnd113 <- Participant113Weekday %>%
+  filter(status == "AtWork-Awake" & minutes != 0 & minutes > 720) %>%
   group_by(date) %>%
-  summarise(minutes = max(minutes)) %>%
-  select(minutes)
+  summarise(minutes = max(minutes)) 
+
+names(WorkEnd113) = c("Dates", "WorkEnd")
 ```
 
+```{r, eval=FALSE}
+P113WeekdaySummary$WorkEnd <- NA
+```
 
 ```{r, eval=FALSE}
-Participant113$status[Participant113$status == "AtRestaurant-PrepareToSleep"] 
-= "AtRestaurant-Awake"
+
+for (i in as.character(WorkEnd113$Dates)) {
+  for (g in as.character(P113WeekdaySummary$Dates)) {
+    if (g == i) {
+      P113WeekdaySummary$WorkEnd[as.character(P113WeekdaySummary$Dates)
+                                       == i] =
+        WorkEnd113$WorkEnd[as.character(WorkEnd113$Dates) == i]
+      
+    }
+  }
+}
+```
+
+### Tidy data
+
+```{r, eval=FALSE}
+Participant113Weekday$status[Participant113Weekday$status == "AtRestaurant-PrepareToSleep"] <- "AtRestaurant-Awake"
+
 ```
 
 ### Lunch
 
 ```{r, eval=FALSE}
-Lunch113 <- Participant113 %>%
+Lunch113 <- Participant113Weekday %>%
   filter(status == "AtRestaurant-Awake" & minutes != 0 & date != "2023-05-24" 
          & minutes <= 960) %>%
   group_by(date) %>%
@@ -586,7 +771,7 @@ names(Lunch113) = c("Dates", "LunchStart")
 ```
 
 ```{r, eval=FALSE}
-Lunch113$LunchEnd<- Participant113 %>%
+Lunch113$LunchEnd<- Participant113Weekday %>%
   filter(status == "AtRestaurant-Awake" & minutes != 0 & date != "2023-05-24" 
          & minutes <= 960) %>%
   group_by(date) %>%
@@ -595,9 +780,9 @@ Lunch113$LunchEnd<- Participant113 %>%
 ```
 
 ```{r, eval=FALSE}
-Participant113Summary$LunchStart <- NA
+P113WeekdaySummary$LunchStart <- NA
 
-Participant113Summary$LunchEnd <- NA
+P113WeekdaySummary$LunchEnd <- NA
 ```
 
 ```{r, eval=FALSE}
@@ -611,13 +796,13 @@ Lunch113$LunchEnd <- as.data.frame(Lunch113$LunchEnd)[[1]]
 ```{r, eval=FALSE}
 
 for (i in as.character(Lunch113$Dates)) {
-  for (g in as.character(Participant113Summary$Dates)) {
+  for (g in as.character(P113WeekdaySummary$Dates)) {
     if (g == i) {
-      Participant113Summary$LunchStart[as.character(Participant113Summary$Dates)
+      P113WeekdaySummary$LunchStart[as.character(P113WeekdaySummary$Dates)
                                        == i] =
         Lunch113$LunchStart[as.character(Lunch113$Dates) == i]
       
-      Participant113Summary$LunchEnd[as.character(Participant113Summary$Dates)
+      P113WeekdaySummary$LunchEnd[as.character(P113WeekdaySummary$Dates)
                                      == i] = 
         Lunch113$LunchEnd[as.character(Lunch113$Dates) == i]
     }
@@ -629,9 +814,9 @@ for (i in as.character(Lunch113$Dates)) {
 ### Dinner
 
 ```{r, eval=FALSE}
-Dinner113 <- Participant113 %>%
+Dinner113 <- Participant113Weekday %>%
   filter(status == "AtRestaurant-Awake" & minutes != 0 & date != "2023-05-24" 
-         & minutes > 960) %>%
+         & minutes >960) %>%
   group_by(date) %>%
   summarise(minutes = min(minutes))
 
@@ -639,7 +824,7 @@ names(Dinner113) = c("Dates", "DinnerStart")
 ```
 
 ```{r, eval=FALSE}
-Dinner113$DinnerEnd<- Participant113 %>%
+Dinner113$DinnerEnd<- Participant113Weekday %>%
   filter(status == "AtRestaurant-Awake" & minutes != 0 & date != "2023-05-24" 
          & minutes > 960) %>%
   group_by(date) %>%
@@ -648,9 +833,9 @@ Dinner113$DinnerEnd<- Participant113 %>%
 ```
 
 ```{r, eval=FALSE}
-Participant113Summary$DinnerStart <- NA
+P113WeekdaySummary$DinnerStart <- NA
 
-Participant113Summary$DinnerEnd <- NA
+P113WeekdaySummary$DinnerEnd <- NA
 ```
 
 ```{r, eval=FALSE}
@@ -664,14 +849,14 @@ Dinner113$DinnerEnd <- as.data.frame(Dinner113$DinnerEnd)[[1]]
 ```{r, eval=FALSE}
 
 for (i in as.character(Dinner113$Dates)) {
-  for (g in as.character(Participant113Summary$Dates)) {
+  for (g in as.character(P113WeekdaySummary$Dates)) {
     if (g == i) {
-      Participant113Summary$DinnerStart[
-        as.character(Participant113Summary$Dates) == i] =
+      P113WeekdaySummary$DinnerStart[as.character(P113WeekdaySummary$Dates)
+                                        == i] =
         Dinner113$DinnerStart[as.character(Dinner113$Dates) == i]
       
-      Participant113Summary$DinnerEnd[
-        as.character(Participant113Summary$Dates) == i] = 
+      P113WeekdaySummary$DinnerEnd[as.character(P113WeekdaySummary$Dates)
+                                      == i] = 
         Dinner113$DinnerEnd[as.character(Dinner113$Dates) == i]
     }
   }
@@ -682,14 +867,12 @@ for (i in as.character(Dinner113$Dates)) {
 ### Recreation 
 
 ```{r, eval=FALSE}
-Participant113$status[Participant113$status == "AtRecreation-PrepareToSleep"]
-= "AtRecreation-Awake"
+Participant113Weekday$status[Participant113Weekday$status == "AtRecreation-PrepareToSleep"] = "AtRecreation-Awake"
 ```
 
 ```{r, eval=FALSE}
-Recreation113 <- Participant113 %>%
-  filter(status == "AtRecreation-Awake" & minutes != 0 
-         & date != "2023-05-24") %>%
+Recreation113 <- Participant113Weekday %>%
+  filter(status == "AtRecreation-Awake" & minutes != 0 & date != "2023-05-24") %>%
   group_by(date) %>%
   summarise(minutes = min(minutes)) 
 
@@ -697,18 +880,17 @@ names(Recreation113) = c("Dates", "RecreationStart")
 ```
 
 ```{r, eval=FALSE}
-Recreation113$RecreationEnd<- Participant113 %>%
-  filter(status == "AtRecreation-Awake" & minutes != 0 
-         & date != "2023-05-24" ) %>%
+Recreation113$RecreationEnd<- Participant113Weekday %>%
+  filter(status == "AtRecreation-Awake" & minutes != 0 & date != "2023-05-24" ) %>%
   group_by(date) %>%
   summarise(minutes = max(minutes)) %>%
   select(minutes)
 ```
 
 ```{r, eval=FALSE}
-Participant113Summary$RecreationStart <- NA
+P113WeekdaySummary$RecreationStart <- NA
 
-Participant113Summary$RecreationEnd <- NA
+P113WeekdaySummary$RecreationEnd <- NA
 ```
 
 ```{r, eval=FALSE}
@@ -722,14 +904,14 @@ Recreation113$RecreationEnd <- as.data.frame(Recreation113$RecreationEnd)[[1]]
 ```{r, eval=FALSE}
 
 for (i in as.character(Recreation113$Dates)) {
-  for (g in as.character(Participant113Summary$Dates)) {
+  for (g in as.character(P113WeekdaySummary$Dates)) {
     if (g == i) {
-      Participant113Summary$RecreationStart[
-        as.character(Participant113Summary$Dates) == i] =
+      P113WeekdaySummary$RecreationStart[
+        as.character(P113WeekdaySummary$Dates) == i] =
         Recreation113$RecreationStart[as.character(Recreation113$Dates) == i]
       
-      Participant113Summary$RecreationEnd[
-        as.character(Participant113Summary$Dates) == i] = 
+      P113WeekdaySummary$RecreationEnd[
+        as.character(P113WeekdaySummary$Dates) == i] = 
         Recreation113$RecreationEnd[as.character(Recreation113$Dates) == i]
     }
   }
@@ -739,25 +921,25 @@ for (i in as.character(Recreation113$Dates)) {
 ### Prepare to Sleep
 
 ```{r, eval=FALSE}
-PrepareToSleep<- Participant113 %>%
-  filter(status == "AtHome-PrepareToSleep" & minutes != 0 
-         & date != "2023-05-24") %>%
+
+PrepareToSleep<- Participant113Weekday %>%
+  filter(status == "AtHome-PrepareToSleep" & minutes != 0 & date != "2023-05-24") %>%
   group_by(date) %>%
   summarise(minutes = max(minutes)) 
 
 ```
 
 ```{r, eval=FALSE}
-Participant113Summary$PrepareToSleep <- NA
+P113WeekdaySummary$PrepareToSleep <- NA
 
 ```
 
 ```{r, eval=FALSE}
 for (i in as.character(PrepareToSleep$date)) {
-  for (g in as.character(Participant113Summary$Dates)) {
+  for (g in as.character(P113WeekdaySummary$Dates)) {
     if (g == i) {
-      Participant113Summary$PrepareToSleep[
-        as.character(Participant113Summary$Dates) == i] = 
+      P113WeekdaySummary$PrepareToSleep[
+        as.character(P113WeekdaySummary$Dates) == i] = 
         PrepareToSleep$minutes[as.character(PrepareToSleep$date) == i]
       
     }
@@ -765,46 +947,35 @@ for (i in as.character(PrepareToSleep$date)) {
 }
 
 ```
-
 ### Further Cleaning
 
 ```{r, eval=FALSE}
-Participant113Summary$Sleep <- 
-  as.data.frame(Participant113Summary$Sleep)[[1]]
+P113WeekdaySummary$Sleep <- 
+  as.data.frame(P113WeekdaySummary$Sleep)[[1]]
 
-Participant113Summary$TransportDayStart <- 
-  as.data.frame(Participant113Summary$TransportDayStart)[[1]]
+P113WeekdaySummary$Backhome <- 
+  as.data.frame(P113WeekdaySummary$Backhome)[[1]]
 
-Participant113Summary$TransportEveningStart <- as.data.frame(Participant113Summary$TransportEveningStart)[[1]]
-
-Participant113Summary$Backhome <- 
-  as.data.frame(Participant113Summary$Backhome)[[1]]
-
-Participant113Summary$WorkStart <- 
-  as.data.frame(Participant113Summary$WorkStart)[[1]]
-
-Participant113Summary$WorkEnd <- 
-  as.data.frame(Participant113Summary$WorkEnd)[[1]]
 
 ```
 
 ```{r, eval=FALSE}
-Participant113Summary$StartSleep <- 0
+P113WeekdaySummary$StartSleep <- 0
 
 ```
 
 ```{r, eval=FALSE}
-Clean113 <- as.data.frame(lapply(Participant113Summary, as.integer))
+Clean113 <- as.data.frame(lapply(P113WeekdaySummary, as.integer))
 ```
 
-```{r, eval=FALSE, echo=FALSE}
+```{r, echo=FALSE, eval=FALSE}
 write_rds(Clean113,
-          "data/rds/Clean113.rds")
+          "data/rds/Weekday113.rds")
 
 ```
 
 ```{r, echo=FALSE}
-Clean113 <- read_rds("data/rds/Clean113.rds")
+Weekday113 <- read_rds("data/rds/Weekday113.rds")
 
 ```
 
@@ -812,15 +983,15 @@ Clean113 <- read_rds("data/rds/Clean113.rds")
 
 ```{r}
 
-p2 <- visielse(Clean113, informer = NULL)
-b2 <- ConvertFromViSibook(p2@book)
+p1 <- visielse(Weekday113, informer = NULL)
+b1 <- ConvertFromViSibook(p1@book)
 
 ```
 
 
 ```{r}
-b2 <- b2[order(as.numeric(b2$showorder)), ] # order the data.frame 
-b2$label <- c("Wake Up", "Sleep", "Day Transport", "Evening Transport",
+b1 <- b1[order(as.numeric(b1$showorder)), ] # order the data.frame 
+b1$label <- c("Wake Up", "Sleep", "Day Transport", "Evening Transport",
               "Reach Home", "Start Work", "End Work", "Start Lunch",
               "End Lunch", "Start Dinner", "End Dinner", "Start Recreation",
               "End Recreation", "Prepare To Sleep", "Start Sleeping")
@@ -828,59 +999,898 @@ b2$label <- c("Wake Up", "Sleep", "Day Transport", "Evening Transport",
 ```
 
 ```{r}
-b2[16,] <- c("sleep", "Sleeping", "l", 1, "StartSleep", "WakeUp")
-b2[17,] <- c("work", "Working", "l", 6, "WorkStart", "WorkEnd")
-b2[18,] <- c("lunch", "Lunch break", "l", 7, "LunchStart", "LunchEnd")
-b2[19,] <- c("dinner", "Dinner", "l", 10, "DinnerStart", "DinnerEnd")
-b2$showorder <- c(2, NA, 3, 8, 10, 4, 6, NA, NA, NA, NA, 12, 13, 11, NA, 1,
+b1[16,] <- c("sleep", "Sleeping", "l", 1, "StartSleep", "WakeUp")
+b1[17,] <- c("work", "Working", "l", 6, "WorkStart", "WorkEnd")
+b1[18,] <- c("lunch", "Lunch break", "l", 7, "LunchStart", "LunchEnd")
+b1[19,] <- c("dinner", "Dinner", "l", 10, "DinnerStart", "DinnerEnd")
+b1$showorder <- c(2, NA, 3, 8, 10, 4, 6, NA, NA, NA, NA, 12, 13, 11, NA, 1,
                   5,7,9) 
-b2 <- b2[order(as.numeric(b2$showorder)), ]
+b1 <- b1[order(as.numeric(b1$showorder)), ]
 ```
 
 ```{r}
-v3 <- visielse(Clean113, 
-               book = b2, 
-               informer = NULL, 
+v2 <- visielse(Weekday113, 
+               book = b1, 
+               informer = "median", 
                doplot = F, 
                pixel = 30)
-plot(v3, 
-     vp0w = 0.7, 
-     unit.tps = "min", 
-     scal.unit.tps = 30, 
-     main = "Typical day for Participant 113")
-```
-
-### Comments
-
-The visualization is almost identical to the previous participant. This will be discussed further in the next section.
-
-
-# Comparison
-
-```{r}
 plot(v2, 
      vp0w = 0.7, 
      unit.tps = "min", 
      scal.unit.tps = 30, 
-     main = "Typical day for Participant 758")
+     main = "Typical Weekday for Participant 113")
 ```
+
+# Participant 758 Weekend
+
+## Data Prep for Participant 758 Weekend
+
+### Create minutes and date column 
+
+```{r, eval=FALSE}
+Participant758Weekend <- Participant758Weekend %>%
+  mutate(minutes = hour(timestamp)*60 + minute(timestamp))
+```
+
+```{r, eval=FALSE}
+Participant758Weekend <- Participant758Weekend %>%
+  mutate(date = date(timestamp))
+```
+
+```{r, eval=FALSE}
+Participant758Weekend$status <- paste(Participant758Weekend$currentMode, 
+                               Participant758Weekend$sleepStatus, sep="-")
+```
+
+### Wake up
+
+```{r, eval=FALSE}
+P758WeekendSummary <- Participant758Weekend %>%
+  filter(status == "AtHome-Awake" & minutes != 0) %>%
+  group_by(date) %>%
+  summarise(minutes = min(minutes))
+
+names(P758WeekendSummary) = c("Dates", "WakeUp")
+```
+
+```{r, eval=FALSE}
+P758WeekendSummary$Sleep <- Participant758Weekend %>%
+  filter(status == "AtHome-Awake" & minutes != 0) %>%
+  group_by(date) %>%
+  summarise(minutes = max(minutes)) %>%
+  select(minutes)
+```
+
+### Transport
+
+#### Transport Day Start
+
+```{r, eval=FALSE}
+TransportWeekend758 <- Participant758Weekend %>%
+  filter(status == "Transport-Awake" & minutes != 0 & minutes <= 720) %>%
+  group_by(date) %>%
+  summarise(minutes = min(minutes))
+
+names(TransportWeekend758) = c("Dates", "TransportDayStart")
+```
+
+```{r, eval=FALSE}
+P758WeekendSummary$TransportDayStart <- NA
+```
+
+```{r, eval=FALSE}
+
+for (i in as.character(TransportWeekend758$Dates)) {
+  for (g in as.character(P758WeekendSummary$Dates)) {
+    if (g == i) {
+      P758WeekendSummary$TransportDayStart[as.character(P758WeekendSummary$Dates)
+                                       == i] =
+        TransportWeekend758$TransportDayStart[as.character(TransportWeekend758$Dates) == i]
+      
+    }
+  }
+}
+```
+
+#### Transport Evening Start
+
+```{r, eval=FALSE}
+TransportWeekend758 <- Participant758Weekend %>%
+  filter(status == "Transport-Awake" & minutes != 0 & minutes > 1035) %>%
+  group_by(date) %>%
+  summarise(minutes = min(minutes))
+
+names(TransportWeekend758) = c("Dates", "TransportEveningStart")
+```
+
+```{r, eval=FALSE}
+P758WeekendSummary$TransportEveningStart <- NA
+```
+
+```{r, eval=FALSE}
+
+for (i in as.character(TransportWeekend758$Dates)) {
+  for (g in as.character(P758WeekendSummary$Dates)) {
+    if (g == i) {
+      P758WeekendSummary$TransportEveningStart[as.character(P758WeekendSummary$Dates)
+                                       == i] =
+        TransportWeekend758$TransportEveningStart[as.character(TransportWeekend758$Dates) == i]
+      
+    }
+  }
+}
+```
+
+#### Back Home
+
+```{r, eval=FALSE}
+P758WeekendSummary$Backhome <- Participant758Weekend %>%
+  filter(status == "AtHome-Awake" & minutes != 0) %>%
+  group_by(date) %>%
+  summarise(minutes = max(minutes)) %>%
+  select(minutes)
+```
+
+#### WorkStart
+
+```{r, eval=FALSE}
+WorkStart758 <- Participant758Weekend %>%
+  filter(status == "AtWork-Awake" & minutes != 0) %>%
+  group_by(date) %>%
+  summarise(minutes = min(minutes)) 
+
+names(WorkStart758) = c("Dates", "WorkStart")
+```
+
+```{r, eval=FALSE}
+P758WeekendSummary$WorkStart <- NA
+```
+
+```{r, eval=FALSE}
+
+for (i in as.character(WorkStart758$Dates)) {
+  for (g in as.character(P758WeekendSummary$Dates)) {
+    if (g == i) {
+      P758WeekendSummary$WorkStart[as.character(P758WeekendSummary$Dates)
+                                       == i] =
+        WorkStart758$WorkStart[as.character(WorkStart758$Dates) == i]
+      
+    }
+  }
+}
+```
+
+#### WorkEnd
+
+```{r, eval=FALSE}
+WorkEnd758 <- Participant758Weekend %>%
+  filter(status == "AtWork-Awake" & minutes != 0 & minutes > 720) %>%
+  group_by(date) %>%
+  summarise(minutes = max(minutes)) 
+
+names(WorkEnd758) = c("Dates", "WorkEnd")
+```
+
+```{r, eval=FALSE}
+P758WeekendSummary$WorkEnd <- NA
+```
+
+```{r, eval=FALSE}
+
+for (i in as.character(WorkEnd758$Dates)) {
+  for (g in as.character(P758WeekendSummary$Dates)) {
+    if (g == i) {
+      P758WeekendSummary$WorkEnd[as.character(P758WeekendSummary$Dates)
+                                       == i] =
+        WorkEnd758$WorkEnd[as.character(WorkEnd758$Dates) == i]
+      
+    }
+  }
+}
+```
+
+### Tidy data
+
+```{r, eval=FALSE}
+Participant758Weekend$status[Participant758Weekend$status == "AtRestaurant-PrepareToSleep"] <- "AtRestaurant-Awake"
+
+```
+
+### Lunch
+
+```{r, eval=FALSE}
+Lunch758 <- Participant758Weekend %>%
+  filter(status == "AtRestaurant-Awake" & minutes != 0 & date != "2023-05-24" 
+         & minutes <= 960) %>%
+  group_by(date) %>%
+  summarise(minutes = min(minutes))
+
+names(Lunch758) = c("Dates", "LunchStart")
+```
+
+```{r, eval=FALSE}
+Lunch758$LunchEnd<- Participant758Weekend %>%
+  filter(status == "AtRestaurant-Awake" & minutes != 0 & date != "2023-05-24" 
+         & minutes <= 960) %>%
+  group_by(date) %>%
+  summarise(minutes = max(minutes)) %>%
+  select(minutes)
+```
+
+```{r, eval=FALSE}
+P758WeekendSummary$LunchStart <- NA
+
+P758WeekendSummary$LunchEnd <- NA
+```
+
+```{r, eval=FALSE}
+names(Lunch758) = c("Dates", "LunchStart", "LunchEnd")
+```
+
+```{r, eval=FALSE}
+Lunch758$LunchEnd <- as.data.frame(Lunch758$LunchEnd)[[1]]
+```
+
+```{r, eval=FALSE}
+
+for (i in as.character(Lunch758$Dates)) {
+  for (g in as.character(P758WeekendSummary$Dates)) {
+    if (g == i) {
+      P758WeekendSummary$LunchStart[as.character(P758WeekendSummary$Dates)
+                                       == i] =
+        Lunch758$LunchStart[as.character(Lunch758$Dates) == i]
+      
+      P758WeekendSummary$LunchEnd[as.character(P758WeekendSummary$Dates)
+                                     == i] = 
+        Lunch758$LunchEnd[as.character(Lunch758$Dates) == i]
+    }
+  }
+}
+```
+
+
+### Dinner
+
+```{r, eval=FALSE}
+Dinner758 <- Participant758Weekend %>%
+  filter(status == "AtRestaurant-Awake" & minutes != 0 & date != "2023-05-24" 
+         & minutes >960) %>%
+  group_by(date) %>%
+  summarise(minutes = min(minutes))
+
+names(Dinner758) = c("Dates", "DinnerStart")
+```
+
+```{r, eval=FALSE}
+Dinner758$DinnerEnd<- Participant758Weekend %>%
+  filter(status == "AtRestaurant-Awake" & minutes != 0 & date != "2023-05-24" 
+         & minutes > 960) %>%
+  group_by(date) %>%
+  summarise(minutes = max(minutes)) %>%
+  select(minutes)
+```
+
+```{r, eval=FALSE}
+P758WeekendSummary$DinnerStart <- NA
+
+P758WeekendSummary$DinnerEnd <- NA
+```
+
+```{r, eval=FALSE}
+names(Dinner758) = c("Dates", "DinnerStart", "DinnerEnd")
+```
+
+```{r, eval=FALSE}
+Dinner758$DinnerEnd <- as.data.frame(Dinner758$DinnerEnd)[[1]]
+```
+
+```{r, eval=FALSE}
+
+for (i in as.character(Dinner758$Dates)) {
+  for (g in as.character(P758WeekendSummary$Dates)) {
+    if (g == i) {
+      P758WeekendSummary$DinnerStart[as.character(P758WeekendSummary$Dates)
+                                        == i] =
+        Dinner758$DinnerStart[as.character(Dinner758$Dates) == i]
+      
+      P758WeekendSummary$DinnerEnd[as.character(P758WeekendSummary$Dates)
+                                      == i] = 
+        Dinner758$DinnerEnd[as.character(Dinner758$Dates) == i]
+    }
+  }
+}
+```
+
+
+### Recreation 
+
+```{r, eval=FALSE}
+Participant758Weekend$status[Participant758Weekend$status == "AtRecreation-PrepareToSleep"] = "AtRecreation-Awake"
+```
+
+```{r, eval=FALSE}
+Recreation758 <- Participant758Weekend %>%
+  filter(status == "AtRecreation-Awake" & minutes != 0 & date != "2023-05-24") %>%
+  group_by(date) %>%
+  summarise(minutes = min(minutes)) 
+
+names(Recreation758) = c("Dates", "RecreationStart")
+```
+
+```{r, eval=FALSE}
+Recreation758$RecreationEnd<- Participant758Weekend %>%
+  filter(status == "AtRecreation-Awake" & minutes != 0 & date != "2023-05-24" ) %>%
+  group_by(date) %>%
+  summarise(minutes = max(minutes)) %>%
+  select(minutes)
+```
+
+```{r, eval=FALSE}
+P758WeekendSummary$RecreationStart <- NA
+
+P758WeekendSummary$RecreationEnd <- NA
+```
+
+```{r, eval=FALSE}
+names(Recreation758) = c("Dates", "RecreationStart", "RecreationEnd")
+```
+
+```{r, eval=FALSE}
+Recreation758$RecreationEnd <- as.data.frame(Recreation758$RecreationEnd)[[1]]
+```
+
+```{r, eval=FALSE}
+
+for (i in as.character(Recreation758$Dates)) {
+  for (g in as.character(P758WeekendSummary$Dates)) {
+    if (g == i) {
+      P758WeekendSummary$RecreationStart[
+        as.character(P758WeekendSummary$Dates) == i] =
+        Recreation758$RecreationStart[as.character(Recreation758$Dates) == i]
+      
+      P758WeekendSummary$RecreationEnd[
+        as.character(P758WeekendSummary$Dates) == i] = 
+        Recreation758$RecreationEnd[as.character(Recreation758$Dates) == i]
+    }
+  }
+}
+```
+
+### Prepare to Sleep
+
+```{r, eval=FALSE}
+
+PrepareToSleep<- Participant758Weekend %>%
+  filter(status == "AtHome-PrepareToSleep" & minutes != 0 & date != "2023-05-24") %>%
+  group_by(date) %>%
+  summarise(minutes = max(minutes)) 
+
+```
+
+```{r, eval=FALSE}
+P758WeekendSummary$PrepareToSleep <- NA
+
+```
+
+```{r, eval=FALSE}
+for (i in as.character(PrepareToSleep$date)) {
+  for (g in as.character(P758WeekendSummary$Dates)) {
+    if (g == i) {
+      P758WeekendSummary$PrepareToSleep[
+        as.character(P758WeekendSummary$Dates) == i] = 
+        PrepareToSleep$minutes[as.character(PrepareToSleep$date) == i]
+      
+    }
+  }
+}
+
+```
+### Further Cleaning
+
+```{r, eval=FALSE}
+P758WeekendSummary$Sleep <- 
+  as.data.frame(P758WeekendSummary$Sleep)[[1]]
+
+P758WeekendSummary$Backhome <- 
+  as.data.frame(P758WeekendSummary$Backhome)[[1]]
+
+
+```
+
+```{r, eval=FALSE}
+P758WeekendSummary$StartSleep <- 0
+
+```
+
+```{r, eval=FALSE}
+Clean758 <- as.data.frame(lapply(P758WeekendSummary, as.integer))
+```
+
+```{r, echo=FALSE, eval=FALSE}
+write_rds(Clean758,
+          "data/rds/Weekend758.rds")
+
+```
+
+```{r, echo=FALSE}
+Weekend758 <- read_rds("data/rds/Weekend758.rds")
+
+```
+
+## Visibook
+
 ```{r}
-plot(v3, 
+
+p1 <- visielse(Weekend758, informer = NULL)
+b1 <- ConvertFromViSibook(p1@book)
+
+```
+
+
+```{r}
+b1 <- b1[order(as.numeric(b1$showorder)), ] # order the data.frame 
+b1$label <- c("Wake Up", "Sleep", "Day Transport", "Evening Transport",
+              "Reach Home", "Start Work", "End Work", "Start Lunch",
+              "End Lunch", "Start Dinner", "End Dinner", "Start Recreation",
+              "End Recreation", "Prepare To Sleep", "Start Sleeping")
+
+```
+
+```{r}
+b1[16,] <- c("sleep", "Sleeping", "l", 1, "StartSleep", "WakeUp")
+b1[17,] <- c("work", "Working", "l", 6, "WorkStart", "WorkEnd")
+b1[18,] <- c("lunch", "Lunch break", "l", 7, "LunchStart", "LunchEnd")
+b1[19,] <- c("dinner", "Dinner", "l", 10, "DinnerStart", "DinnerEnd")
+b1$showorder <- c(2, NA, 3, 8, 10, 4, 6, NA, NA, NA, NA, 12, 13, 11, NA, 1,
+                  5,7,9) 
+b1 <- b1[order(as.numeric(b1$showorder)), ]
+```
+
+```{r}
+v2 <- visielse(Weekend758, 
+               book = b1, 
+               informer = "median", 
+               doplot = F, 
+               pixel = 30)
+plot(v2, 
      vp0w = 0.7, 
      unit.tps = "min", 
      scal.unit.tps = 30, 
-     main = "Typical day for Participant 113")
+     main = "Typical Weekend for Participant 758")
 ```
-## Comments:
+# Participant 113 Weekend
 
-There is not much difference seen in the graphs of both participants. This may be due to multiple reasons:
+## Data Prep for Participant 113 Weekend
 
-1) There may have been an error in the way the data was extracted from the journal
-2) The manner in which the data was cleaned was too prescriptive, forcing the timing upon the activites
-3) The difference in joviality did not play a large factor in the daily lives of the participants
-  - There may be other more influential attibutes such as age that may show a greater disparity in terms of activity
-  
-# Other Feedback
+### Create minutes and date column 
 
-On hindsight the ViSiElse library may not have been the most effective for this visualization as it is very rigid in terms of the data formatting required. This led to extensive hours of data cleaning before any visualization could be acheived to check if the progress made was on the right track.
+```{r, eval=FALSE}
+Participant113Weekend <- Participant113Weekend %>%
+  mutate(minutes = hour(timestamp)*60 + minute(timestamp))
+```
 
+```{r, eval=FALSE}
+Participant113Weekend <- Participant113Weekend %>%
+  mutate(date = date(timestamp))
+```
+
+```{r, eval=FALSE}
+Participant113Weekend$status <- paste(Participant113Weekend$currentMode, 
+                               Participant113Weekend$sleepStatus, sep="-")
+```
+
+### Wake up
+
+```{r, eval=FALSE}
+P113WeekendSummary <- Participant113Weekend %>%
+  filter(status == "AtHome-Awake" & minutes != 0) %>%
+  group_by(date) %>%
+  summarise(minutes = min(minutes))
+
+names(P113WeekendSummary) = c("Dates", "WakeUp")
+```
+
+```{r, eval=FALSE}
+P113WeekendSummary$Sleep <- Participant113Weekend %>%
+  filter(status == "AtHome-Awake" & minutes != 0) %>%
+  group_by(date) %>%
+  summarise(minutes = max(minutes)) %>%
+  select(minutes)
+```
+
+### Transport
+
+#### Transport Day Start
+
+```{r, eval=FALSE}
+TransportWeekend113 <- Participant113Weekend %>%
+  filter(status == "Transport-Awake" & minutes != 0 & minutes <= 720) %>%
+  group_by(date) %>%
+  summarise(minutes = min(minutes))
+
+names(TransportWeekend113) = c("Dates", "TransportDayStart")
+```
+
+```{r, eval=FALSE}
+P113WeekendSummary$TransportDayStart <- NA
+```
+
+```{r, eval=FALSE}
+
+for (i in as.character(TransportWeekend113$Dates)) {
+  for (g in as.character(P113WeekendSummary$Dates)) {
+    if (g == i) {
+      P113WeekendSummary$TransportDayStart[as.character(P113WeekendSummary$Dates)
+                                       == i] =
+        TransportWeekend113$TransportDayStart[as.character(TransportWeekend113$Dates) == i]
+      
+    }
+  }
+}
+```
+
+#### Transport Evening Start
+
+```{r, eval=FALSE}
+TransportWeekend113 <- Participant113Weekend %>%
+  filter(status == "Transport-Awake" & minutes != 0 & minutes > 1035) %>%
+  group_by(date) %>%
+  summarise(minutes = min(minutes))
+
+names(TransportWeekend113) = c("Dates", "TransportEveningStart")
+```
+
+```{r, eval=FALSE}
+P113WeekendSummary$TransportEveningStart <- NA
+```
+
+```{r, eval=FALSE}
+
+for (i in as.character(TransportWeekend113$Dates)) {
+  for (g in as.character(P113WeekendSummary$Dates)) {
+    if (g == i) {
+      P113WeekendSummary$TransportEveningStart[as.character(P113WeekendSummary$Dates)
+                                       == i] =
+        TransportWeekend113$TransportEveningStart[as.character(TransportWeekend113$Dates) == i]
+      
+    }
+  }
+}
+```
+
+#### Back Home
+
+```{r, eval=FALSE}
+P113WeekendSummary$Backhome <- Participant113Weekend %>%
+  filter(status == "AtHome-Awake" & minutes != 0) %>%
+  group_by(date) %>%
+  summarise(minutes = max(minutes)) %>%
+  select(minutes)
+```
+
+#### WorkStart
+
+```{r, eval=FALSE}
+WorkStart113 <- Participant113Weekend %>%
+  filter(status == "AtWork-Awake" & minutes != 0) %>%
+  group_by(date) %>%
+  summarise(minutes = min(minutes)) 
+
+names(WorkStart113) = c("Dates", "WorkStart")
+```
+
+```{r, eval=FALSE}
+P113WeekendSummary$WorkStart <- NA
+```
+
+```{r, eval=FALSE}
+
+for (i in as.character(WorkStart113$Dates)) {
+  for (g in as.character(P113WeekendSummary$Dates)) {
+    if (g == i) {
+      P113WeekendSummary$WorkStart[as.character(P113WeekendSummary$Dates)
+                                       == i] =
+        WorkStart113$WorkStart[as.character(WorkStart113$Dates) == i]
+      
+    }
+  }
+}
+```
+
+#### WorkEnd
+
+```{r, eval=FALSE}
+WorkEnd113 <- Participant113Weekend %>%
+  filter(status == "AtWork-Awake" & minutes != 0 & minutes > 720) %>%
+  group_by(date) %>%
+  summarise(minutes = max(minutes)) 
+
+names(WorkEnd113) = c("Dates", "WorkEnd")
+```
+
+```{r, eval=FALSE}
+P113WeekendSummary$WorkEnd <- NA
+```
+
+```{r, eval=FALSE}
+
+for (i in as.character(WorkEnd113$Dates)) {
+  for (g in as.character(P113WeekendSummary$Dates)) {
+    if (g == i) {
+      P113WeekendSummary$WorkEnd[as.character(P113WeekendSummary$Dates)
+                                       == i] =
+        WorkEnd113$WorkEnd[as.character(WorkEnd113$Dates) == i]
+      
+    }
+  }
+}
+```
+
+### Tidy data
+
+```{r, eval=FALSE}
+Participant113Weekend$status[Participant113Weekend$status == "AtRestaurant-PrepareToSleep"] <- "AtRestaurant-Awake"
+
+```
+
+### Lunch
+
+```{r, eval=FALSE}
+Lunch113 <- Participant113Weekend %>%
+  filter(status == "AtRestaurant-Awake" & minutes != 0 & date != "2023-05-24" 
+         & minutes <= 960) %>%
+  group_by(date) %>%
+  summarise(minutes = min(minutes))
+
+names(Lunch113) = c("Dates", "LunchStart")
+```
+
+```{r, eval=FALSE}
+Lunch113$LunchEnd<- Participant113Weekend %>%
+  filter(status == "AtRestaurant-Awake" & minutes != 0 & date != "2023-05-24" 
+         & minutes <= 960) %>%
+  group_by(date) %>%
+  summarise(minutes = max(minutes)) %>%
+  select(minutes)
+```
+
+```{r, eval=FALSE}
+P113WeekendSummary$LunchStart <- NA
+
+P113WeekendSummary$LunchEnd <- NA
+```
+
+```{r, eval=FALSE}
+names(Lunch113) = c("Dates", "LunchStart", "LunchEnd")
+```
+
+```{r, eval=FALSE}
+Lunch113$LunchEnd <- as.data.frame(Lunch113$LunchEnd)[[1]]
+```
+
+```{r, eval=FALSE}
+
+for (i in as.character(Lunch113$Dates)) {
+  for (g in as.character(P113WeekendSummary$Dates)) {
+    if (g == i) {
+      P113WeekendSummary$LunchStart[as.character(P113WeekendSummary$Dates)
+                                       == i] =
+        Lunch113$LunchStart[as.character(Lunch113$Dates) == i]
+      
+      P113WeekendSummary$LunchEnd[as.character(P113WeekendSummary$Dates)
+                                     == i] = 
+        Lunch113$LunchEnd[as.character(Lunch113$Dates) == i]
+    }
+  }
+}
+```
+
+
+### Dinner
+
+```{r, eval=FALSE}
+Dinner113 <- Participant113Weekend %>%
+  filter(status == "AtRestaurant-Awake" & minutes != 0 & date != "2023-05-24" 
+         & minutes >960) %>%
+  group_by(date) %>%
+  summarise(minutes = min(minutes))
+
+names(Dinner113) = c("Dates", "DinnerStart")
+```
+
+```{r, eval=FALSE}
+Dinner113$DinnerEnd<- Participant113Weekend %>%
+  filter(status == "AtRestaurant-Awake" & minutes != 0 & date != "2023-05-24" 
+         & minutes > 960) %>%
+  group_by(date) %>%
+  summarise(minutes = max(minutes)) %>%
+  select(minutes)
+```
+
+```{r, eval=FALSE}
+P113WeekendSummary$DinnerStart <- NA
+
+P113WeekendSummary$DinnerEnd <- NA
+```
+
+```{r, eval=FALSE}
+names(Dinner113) = c("Dates", "DinnerStart", "DinnerEnd")
+```
+
+```{r, eval=FALSE}
+Dinner113$DinnerEnd <- as.data.frame(Dinner113$DinnerEnd)[[1]]
+```
+
+```{r, eval=FALSE}
+
+for (i in as.character(Dinner113$Dates)) {
+  for (g in as.character(P113WeekendSummary$Dates)) {
+    if (g == i) {
+      P113WeekendSummary$DinnerStart[as.character(P113WeekendSummary$Dates)
+                                        == i] =
+        Dinner113$DinnerStart[as.character(Dinner113$Dates) == i]
+      
+      P113WeekendSummary$DinnerEnd[as.character(P113WeekendSummary$Dates)
+                                      == i] = 
+        Dinner113$DinnerEnd[as.character(Dinner113$Dates) == i]
+    }
+  }
+}
+```
+
+
+### Recreation 
+
+```{r, eval=FALSE}
+Participant113Weekend$status[Participant113Weekend$status == "AtRecreation-PrepareToSleep"] = "AtRecreation-Awake"
+```
+
+```{r, eval=FALSE}
+Recreation113 <- Participant113Weekend %>%
+  filter(status == "AtRecreation-Awake" & minutes != 0 & date != "2023-05-24") %>%
+  group_by(date) %>%
+  summarise(minutes = min(minutes)) 
+
+names(Recreation113) = c("Dates", "RecreationStart")
+```
+
+```{r, eval=FALSE}
+Recreation113$RecreationEnd<- Participant113Weekend %>%
+  filter(status == "AtRecreation-Awake" & minutes != 0 & date != "2023-05-24" ) %>%
+  group_by(date) %>%
+  summarise(minutes = max(minutes)) %>%
+  select(minutes)
+```
+
+```{r, eval=FALSE}
+P113WeekendSummary$RecreationStart <- NA
+
+P113WeekendSummary$RecreationEnd <- NA
+```
+
+```{r, eval=FALSE}
+names(Recreation113) = c("Dates", "RecreationStart", "RecreationEnd")
+```
+
+```{r, eval=FALSE}
+Recreation113$RecreationEnd <- as.data.frame(Recreation113$RecreationEnd)[[1]]
+```
+
+```{r, eval=FALSE}
+
+for (i in as.character(Recreation113$Dates)) {
+  for (g in as.character(P113WeekendSummary$Dates)) {
+    if (g == i) {
+      P113WeekendSummary$RecreationStart[
+        as.character(P113WeekendSummary$Dates) == i] =
+        Recreation113$RecreationStart[as.character(Recreation113$Dates) == i]
+      
+      P113WeekendSummary$RecreationEnd[
+        as.character(P113WeekendSummary$Dates) == i] = 
+        Recreation113$RecreationEnd[as.character(Recreation113$Dates) == i]
+    }
+  }
+}
+```
+
+### Prepare to Sleep
+
+```{r, eval=FALSE}
+
+PrepareToSleep<- Participant113Weekend %>%
+  filter(status == "AtHome-PrepareToSleep" & minutes != 0 & date != "2023-05-24") %>%
+  group_by(date) %>%
+  summarise(minutes = max(minutes)) 
+
+```
+
+```{r, eval=FALSE}
+P113WeekendSummary$PrepareToSleep <- NA
+
+```
+
+```{r, eval=FALSE}
+for (i in as.character(PrepareToSleep$date)) {
+  for (g in as.character(P113WeekendSummary$Dates)) {
+    if (g == i) {
+      P113WeekendSummary$PrepareToSleep[
+        as.character(P113WeekendSummary$Dates) == i] = 
+        PrepareToSleep$minutes[as.character(PrepareToSleep$date) == i]
+      
+    }
+  }
+}
+
+```
+### Further Cleaning
+
+```{r, eval=FALSE}
+P113WeekendSummary$Sleep <- 
+  as.data.frame(P113WeekendSummary$Sleep)[[1]]
+
+P113WeekendSummary$Backhome <- 
+  as.data.frame(P113WeekendSummary$Backhome)[[1]]
+
+
+```
+
+```{r, eval=FALSE}
+P113WeekendSummary$StartSleep <- 0
+
+```
+
+```{r, eval=FALSE}
+Clean113 <- as.data.frame(lapply(P113WeekendSummary, as.integer))
+```
+
+```{r, echo=FALSE, eval=FALSE}
+write_rds(Clean113,
+          "data/rds/Weekend113.rds")
+
+```
+
+```{r, echo=FALSE}
+Weekend113 <- read_rds("data/rds/Weekend113.rds")
+
+```
+
+## Visibook
+
+```{r}
+
+p1 <- visielse(Weekend113, informer = NULL)
+b1 <- ConvertFromViSibook(p1@book)
+
+```
+
+```{r}
+b1 <- b1[order(as.numeric(b1$showorder)), ] # order the data.frame 
+b1$label <- c("Wake Up", "Sleep", "Day Transport", "Evening Transport",
+              "Reach Home", "Start Work", "End Work", "Start Lunch",
+              "End Lunch", "Start Dinner", "End Dinner", "Start Recreation",
+              "End Recreation", "Prepare To Sleep", "Start Sleeping")
+
+```
+
+```{r}
+b1[16,] <- c("sleep", "Sleeping", "l", 1, "StartSleep", "WakeUp")
+b1[17,] <- c("work", "Working", "l", 6, "WorkStart", "WorkEnd")
+b1[18,] <- c("lunch", "Lunch break", "l", 7, "LunchStart", "LunchEnd")
+b1[19,] <- c("dinner", "Dinner", "l", 10, "DinnerStart", "DinnerEnd")
+b1$showorder <- c(2, NA, 3, 8, 10, 4, 6, NA, NA, NA, NA, 12, 13, 11, NA, 1,
+                  5,7,9) 
+b1 <- b1[order(as.numeric(b1$showorder)), ]
+```
+
+```{r}
+v2 <- visielse(Weekend113, 
+               book = b1, 
+               informer = "median", 
+               doplot = F, 
+               pixel = 30)
+plot(v2, 
+     vp0w = 0.7, 
+     unit.tps = "min", 
+     scal.unit.tps = 30, 
+     main = "Typical Weekend for Participant 113")
+```
