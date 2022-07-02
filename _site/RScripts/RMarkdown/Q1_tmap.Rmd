@@ -1,0 +1,53 @@
+---
+title: "City Area Characterization"
+description: |
+  Question 1
+author:
+  - name: Nora Jones 
+    url: https://example.com/norajones
+    affiliation: Spacely Sprockets
+    affiliation_url: https://example.com/spacelysprokets
+date: "`r Sys.Date()`"
+output: distill::distill_article
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r}
+packages = c('sf', 'tidyverse','tmap','lubridate','clock')
+for (p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+}
+```
+
+```{r}
+buildings_shp <- read_sf("data/shapefile/buildings.shp",
+             options = "GEOM_POSSIBLE_NAMES=Location")
+```
+
+Standard map using ggplot
+
+```{r}
+ggplot(buildings_shp) +
+  geom_sf() +
+  coord_sf()
+```
+
+Geographical map split into 4 regions
+
+```{r}
+ggplot(buildings_shp) +
+  geom_sf(aes(fill = region),
+          color = "black",
+          size = 0.1,
+          show.legend = TRUE) +
+  coord_sf() +
+  theme_bw() +
+  labs(title="Geographical region of the study area")
+```
+
+

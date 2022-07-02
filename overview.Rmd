@@ -1,0 +1,86 @@
+---
+title: "Overview"
+output: 
+  distill::distill_article:
+    toc: true
+    toc_float: true
+    toc_collapsed: true
+    number_sections: true
+    code_folding: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      eval = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.retina = 3)
+```
+
+## 1. Objective 
+
+This project aims to provide an interactive web-enabled visualizations to allow users to identify the life patterns of Engagement City, Ohio USA in a single dashboard.
+
+The application is built to integrate techniques from data analytics and data visualizations by using R shiny.
+
+## 2. Data Description
+
+Datasets were obtained from the VAST Challenge 2022 official website in csv format. They contain information of the participants as well as the facilities located within the city. 
+
+## 3. Methodology
+
+The following are R packages required for this project.
+
+::: l-body
+| Packages | Purpose |
+|----------|---------|
+| shiny | To build interactive web application and visualizations |
+| tidyverse	| To support basic data manipulation |
+| sf	| To handle geospatial data in wkt format |
+| tmap	| To visualize movement data | 
+| lubridate	| To manipulate date-time object | 
+| clock	| To manipulate date-time object | 
+| ViSiElse	| To visualize daily routines |
+| ggstatsplot	| To provide statistical analysis and graphs |
+
+:::
+
+## 4. Storyboard
+
+### 4.1 City Area Characterization
+
+#### Problem Statement
+
+Assuming the volunteers are representative of the city’s population, characterize the distinct areas of the city that you identify. For each area you identify, provide your rationale and supporting data. 
+
+#### Visualization
+
+This visualization divides the city into four regions and shows the outline of the different buildings as well as the location of different facilities (Apartments, Pubs, Restaurants and Schools).
+
+Another visualization shows how the demographic attributes of the participants affect the location that they reside at. 
+
+
+### 4.2 Traffic Bottlenecks
+
+#### Problem Statement
+
+Where are the busiest areas in Engagement? Are there traffic bottlenecks that should be addressed? Explain your rationale.
+
+#### Visualization
+
+This visualization will find out peak periods of high traffic at various locations in the city by counting the footfall of participants at various participants across the day in the form of calendar heat map. Additional segregation to be done to visualize the difference between weekdays and weekends.
+
+Furthermore, another visualization is plotted to show the traffic density heatmap of the various locations in the city via hexagon mapping, with toggles on the Time (binned), Month and Weekday/Weekend to showcase the difference in the traffic bottlenecks.
+
+
+### 4.3 Daily Routines of Participants
+
+#### Problem Statement
+
+Participants have given permission to have their daily routines captured. Choose two different participants with different routines and describe their daily patterns, with supporting evidence.
+
+#### Visualization
+
+This visualization shows the participant profiles, followed by daily activities of two selected participants. It tells the audience how their weekdays and weekends routines vary across different months. 
+
+
