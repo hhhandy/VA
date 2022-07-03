@@ -5,7 +5,7 @@ description: |
 image: 'image/Ohio.jpg'
 links:
   - label: Explore now!
-    url:
+    url: https://heranshansubramaniam.shinyapps.io/project2/
 output:
   postcards::jolla
 site: distill::distill_website

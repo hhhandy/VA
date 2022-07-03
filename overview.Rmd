@@ -104,5 +104,5 @@ Participants have given permission to have their daily routines captured. Choose
 This visualization shows the participant profiles, followed by daily activities of two selected participants. It tells the audience how their weekdays and weekends routines vary across different months. 
 
 
-### Click [here]() to explore the app!
+### Click [here](https://heranshansubramaniam.shinyapps.io/project2/) to explore the app!
 
