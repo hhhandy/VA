@@ -1,13 +1,26 @@
 ---
 title: "The Authors"
-description: |
-  Some additional details about the website
 ---
-
-Antonius HANDY | Heranshan S/o SUBRAMANIAM | TAY Cheng Wei Clarence
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
+<center>
+
+We are three Master of IT in Business students in Singapore Management University.
+
+Click our name to get in touch with us!
+
+[**Antonius HANDY**](https://sg.linkedin.com/in/antoniushandy)   |   [**Heranshan S/o SUBRAMANIAM**](https://sg.linkedin.com/in/heranshan)   |   [**TAY Cheng Wei Clarence**](https://sg.linkedin.com/in/clarencetay)
+
+
+Our Mentor:
+
+[**Prof KAM Tin Seong**](https://faculty.smu.edu.sg/profile/kam-tin-seong-486)
+
+Full-time Faculty, SMU
+
+Associate Professor of Information Systems (Practice)
+
+</center>

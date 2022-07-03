@@ -1,21 +1,22 @@
 name: "ISSS608"
-title: "Visual Analytics Project"
+title: "Patterns of Life"
 theme: 'theme.css'
 description: |
   Vast Challenge 2022
 output_dir: "_site"
 navbar:
   logo:
-    image: image/r.png
+    image: image/Rblue.png
     href: https://www.rstudio.com/products/rstudio/
-  search: true
   right:
     - text: "Home"
       href: index.html
-    - text: "About Us"
-      href: about.html
     - text: "Proposal"
       href: "proposal.html"
     - text: "Overview"
       href: "overview.html"
+    - text: "User Guide"
+      href: 
+    - text: "About Us"
+      href: about.html
 output: distill::distill_article

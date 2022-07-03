@@ -87,26 +87,26 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
 
   <!--radix_placeholder_meta_tags-->
-  <title>Visual Analytics Project: Overview</title>
+  <title>Patterns of Life: Overview</title>
 
 
 
 
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
-  <meta property="og:title" content="Visual Analytics Project: Overview"/>
+  <meta property="og:title" content="Patterns of Life: Overview"/>
   <meta property="og:type" content="article"/>
   <meta property="og:locale" content="en_US"/>
-  <meta property="og:site_name" content="Visual Analytics Project"/>
+  <meta property="og:site_name" content="Patterns of Life"/>
 
   <!--  https://dev.twitter.com/cards/types/summary -->
   <meta property="twitter:card" content="summary"/>
-  <meta property="twitter:title" content="Visual Analytics Project: Overview"/>
+  <meta property="twitter:title" content="Patterns of Life: Overview"/>
 
   <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","output"]}},"value":[{"type":"character","attributes":{},"value":["Overview"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc","toc_float","toc_collapsed","number_sections","code_folding"]}},"value":[{"type":"logical","attributes":{},"value":[true]},{"type":"logical","attributes":{},"value":[true]},{"type":"logical","attributes":{},"value":[true]},{"type":"logical","attributes":{},"value":[true]},{"type":"logical","attributes":{},"value":[true]}]}]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","output"]}},"value":[{"type":"character","attributes":{},"value":["Overview"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc","toc_float","toc_collapsed","number_sections"]}},"value":[{"type":"logical","attributes":{},"value":[true]},{"type":"logical","attributes":{},"value":[true]},{"type":"logical","attributes":{},"value":[true]},{"type":"logical","attributes":{},"value":[true]}]}]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   <!--radix_placeholder_navigation_in_header-->
@@ -2157,7 +2157,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
   /*-- ARTICLE TABLE OF CONTENTS --*/
   .d-contents {
-    --heading-size:    18px;
+    --heading-size:    15px;
     --contents-size:   13px;
   }
 
@@ -2173,7 +2173,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   /* These properties only apply to Distill sites and blogs  */
 
   .distill-site-header {
-    --title-size:       18px;
+    --title-size:       15px;
     --text-color:       #1f1f1f;                   /* edited */
     --text-size:        15px;
     --hover-color:      white;                   /* edited */
@@ -2406,16 +2406,16 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <nav class="distill-site-nav distill-site-header">
 <div class="nav-left">
 <a class="logo" href="https://www.rstudio.com/products/rstudio/">
-<img src="image/r.png" alt="Logo"/>
+<img src="image/Rblue.PNG" alt="Logo"/>
 </a>
-<a href="index.html" class="title">Visual Analytics Project</a>
-<input id="distill-search" class="nav-search hidden" type="text" placeholder="Search..."/>
+<a href="index.html" class="title">Patterns of Life</a>
 </div>
 <div class="nav-right">
 <a href="index.html">Home</a>
-<a href="about.html">About Us</a>
 <a href="proposal.html">Proposal</a>
 <a href="overview.html">Overview</a>
+<span class="nav-dropdown-header">User Guide</span>
+<a href="about.html">About Us</a>
 <a href="javascript:void(0);" class="nav-toggle">&#9776;</a>
 </div>
 </nav>
@@ -2453,7 +2453,7 @@ Participants</a></li>
 </div>
 <h2 id="objective">1. Objective</h2>
 <p>This project aims to provide an interactive web-enabled
-visualizations to allow users to identify the life patterns of
+visualizations to allow users to identify the life patterns in
 Engagement City, Ohio USA in a single dashboard.</p>
 <p>The application is built to integrate techniques from data analytics
 and data visualizations by using R shiny.</p>
@@ -2462,9 +2462,23 @@ and data visualizations by using R shiny.</p>
 in csv format. They contain information of the participants as well as
 the facilities located within the city.</p>
 <h2 id="methodology">3. Methodology</h2>
-<p>The following are R packages required for this project.</p>
+<p>The steps required in this project are as follows.</p>
+<p><strong>Data wrangling</strong>: To perform basic function such as
+joining datasets and filtering, to convert datasets into a format that
+can be read by R packages and to reduce the file size.</p>
+<p><strong>Descriptive analysis</strong>: Use appropriate static and
+interactive statistical graphs to show the patterns of life within the
+city.</p>
+<p><strong>Dashboarding</strong>: To compile all the graphs into an
+interactive dashboard.</p>
+<p>The following are R packages required to perform the analysis and
+create the dashboard.</p>
 <div class="l-body">
 <table>
+<colgroup>
+<col style="width: 52%" />
+<col style="width: 47%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>Packages</th>
@@ -2473,16 +2487,24 @@ the facilities located within the city.</p>
 </thead>
 <tbody>
 <tr class="odd">
-<td>shiny</td>
+<td>shiny, shinydashboard &amp; shinywidgets</td>
 <td>To build interactive web application and visualizations</td>
 </tr>
 <tr class="even">
+<td>shinythemes</td>
+<td>To select beautiful shiny themes</td>
+</tr>
+<tr class="odd">
 <td>tidyverse</td>
 <td>To support basic data manipulation</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>sf</td>
 <td>To handle geospatial data in wkt format</td>
+</tr>
+<tr class="odd">
+<td>sftime</td>
+<td>To store and handle spatiotemporal data</td>
 </tr>
 <tr class="even">
 <td>tmap</td>
@@ -2497,12 +2519,36 @@ the facilities located within the city.</p>
 <td>To manipulate date-time object</td>
 </tr>
 <tr class="odd">
+<td>anytime</td>
+<td>To convert timestamp into parsed datetime</td>
+</tr>
+<tr class="even">
 <td>ViSiElse</td>
 <td>To visualize daily routines</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>ggstatsplot</td>
 <td>To provide statistical analysis and graphs</td>
+</tr>
+<tr class="even">
+<td>plotly &amp; ggiraph</td>
+<td>To create interactive graphs</td>
+</tr>
+<tr class="odd">
+<td>DT</td>
+<td>To create interactive data table</td>
+</tr>
+<tr class="even">
+<td>data.table</td>
+<td>To support aggegation of large datasets</td>
+</tr>
+<tr class="odd">
+<td>rmarkdown</td>
+<td>To convert R markdown into desired format</td>
+</tr>
+<tr class="even">
+<td>ggthemes</td>
+<td>To beautify statistical graphs</td>
 </tr>
 </tbody>
 </table>

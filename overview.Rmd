@@ -6,7 +6,6 @@ output:
     toc_float: true
     toc_collapsed: true
     number_sections: true
-    code_folding: true
 ---
 
 ```{r setup, include=FALSE}
@@ -19,7 +18,7 @@ knitr::opts_chunk$set(echo = TRUE,
 
 ## 1. Objective 
 
-This project aims to provide an interactive web-enabled visualizations to allow users to identify the life patterns of Engagement City, Ohio USA in a single dashboard.
+This project aims to provide an interactive web-enabled visualizations to allow users to identify the life patterns in Engagement City, Ohio USA in a single dashboard.
 
 The application is built to integrate techniques from data analytics and data visualizations by using R shiny.
 
@@ -29,21 +28,38 @@ Datasets were obtained from the VAST Challenge 2022 official website in csv form
 
 ## 3. Methodology
 
-The following are R packages required for this project.
+The steps required in this project are as follows.
+
+**Data wrangling**: To perform basic function such as joining datasets and filtering, to convert datasets into a format that can be read by R packages and to reduce the file size. 
+
+**Descriptive analysis**: Use appropriate static and interactive statistical graphs to show the patterns of life within the city.
+
+**Dashboarding**: To compile all the graphs into an interactive dashboard.
+
+The following are R packages required to perform the analysis and create the dashboard.
 
 ::: l-body
 | Packages | Purpose |
 |----------|---------|
-| shiny | To build interactive web application and visualizations |
+| shiny, shinydashboard & shinywidgets | To build interactive web application and visualizations |
+| shinythemes | To select beautiful shiny themes |
 | tidyverse	| To support basic data manipulation |
 | sf	| To handle geospatial data in wkt format |
+| sftime | To store and handle spatiotemporal data  |
 | tmap	| To visualize movement data | 
 | lubridate	| To manipulate date-time object | 
-| clock	| To manipulate date-time object | 
+| clock	| To manipulate date-time object |
+| anytime | To convert timestamp into parsed datetime |
 | ViSiElse	| To visualize daily routines |
 | ggstatsplot	| To provide statistical analysis and graphs |
+| plotly & ggiraph | To create interactive graphs |
+| DT | To create interactive data table |
+| data.table | To support aggegation of large datasets |
+| rmarkdown | To convert R markdown into desired format |
+| ggthemes | To beautify statistical graphs |
 
 :::
+
 
 ## 4. Storyboard
 
