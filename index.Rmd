@@ -6,8 +6,6 @@ image: 'image/Ohio.jpg'
 links:
   - label: App
     url:
-  - label: Poster
-    url: 
 output:
   postcards::jolla
 site: distill::distill_website

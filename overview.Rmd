@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE,
                       fig.retina = 3)
 ```
 
-## 1. Objective 
+## 1. Introduction
 
 This project aims to provide an interactive web-enabled visualizations to allow users to identify the life patterns in Engagement City, Ohio USA in a single dashboard.
 
@@ -99,4 +99,6 @@ Participants have given permission to have their daily routines captured. Choose
 
 This visualization shows the participant profiles, followed by daily activities of two selected participants. It tells the audience how their weekdays and weekends routines vary across different months. 
 
+
+### Click [here]() to explore the app!
 

@@ -5,16 +5,13 @@ description: |
   Vast Challenge 2022
 output_dir: "_site"
 navbar:
-  logo:
-    image: image/Rblue.png
-    href: https://www.rstudio.com/products/rstudio/
   right:
-    - text: "Home"
+    - icon: fa-home
       href: index.html
-    - text: "Proposal"
-      href: "proposal.html"
     - text: "Overview"
       href: "overview.html"
+    - text: "Poster"
+      href: 
     - text: "User Guide"
       href: test.pdf
     - text: "About Us"
