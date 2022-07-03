@@ -16,15 +16,19 @@ knitr::opts_chunk$set(echo = TRUE,
                       fig.retina = 3)
 ```
 
+# Patterns of Life
+
 ## 1. Introduction
 
-This project aims to provide an interactive web-enabled visualizations to allow users to identify the life patterns in Engagement City, Ohio USA in a single dashboard.
+The city of Engagement, Ohio USA is anticipating future rapid growth by doing a participatory urban planning survey with 1011 representative residents. City planning team is to make sense of data provided to understand the current state of the city. 
 
-The application is built to integrate techniques from data analytics and data visualizations by using R shiny.
+This project aims to provide an **interactive web-enabled visualizations** to allow users to identify and visualize the **life patterns** in the city in a single dashboard. Users will be able to see where the facilities are located, the busiest areas and traffic bottlenecks within the city and how the daily routines differ between two selected participants.
+
+The application is built to integrate techniques from data analytics and data visualizations by using **R shiny**.
 
 ## 2. Data Description
 
-Datasets were obtained from the VAST Challenge 2022 official website in csv format. They contain information of the participants as well as the facilities located within the city. 
+Datasets were obtained from the [**VAST Challenge 2022**](https://vast-challenge.github.io/2022/) official website in csv format. They contain information of the participants as well as the facilities located within the city. 
 
 ## 3. Methodology
 

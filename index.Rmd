@@ -4,7 +4,7 @@ description: |
   Patterns of Life of Engagement City, Ohio USA
 image: 'image/Ohio.jpg'
 links:
-  - label: App
+  - label: Explore now!
     url:
 output:
   postcards::jolla
@@ -15,7 +15,7 @@ This Visual Analytics Project is based on [**VAST Challenge 2022**](https://vast
 
 The city of Engagement, Ohio USA is anticipating future rapid growth by doing a participatory urban planning survey with 1011 representative residents. City planning team is to make sense of data provided to understand the current state of the city.
 
-Find out where the facilities are located, the busiest areas and traffic bottlenecks within the city and how the daily routines differ between two selected participants by clicking on the app button below.
+Find out where the facilities are located, the busiest areas and traffic bottlenecks within the city and how the daily routines differ between two selected participants by clicking on the explore button below.
 
 
 ```{r setup, include=FALSE}
