@@ -16,7 +16,7 @@ navbar:
     - text: "Overview"
       href: "overview.html"
     - text: "User Guide"
-      href: 
+      href: test.pdf
     - text: "About Us"
       href: about.html
 output: distill::distill_article
