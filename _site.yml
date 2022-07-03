@@ -13,7 +13,7 @@ navbar:
     - text: "Poster"
       href: 
     - text: "User Guide"
-      href: test.pdf
+      href: 
     - text: "About Us"
       href: about.html
 output: distill::distill_article
